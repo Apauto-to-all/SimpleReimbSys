@@ -34,11 +34,11 @@ class DatabaseOperation:
             # 读取配置文件
             with open(config.private_info_json, "r") as f:
                 private_info = json.load(f)
-                pgsql_user = private_info["pgsql_user"]  # 数据库操作用户
-                pgsql_password = private_info["pgsql_password"]  # 数据库操作用户密码
-                database_name = private_info["database_name"]  # 数据库名称
-                pgsql_host = private_info["pgsql_host"]  # 数据库主机
-                pgsql_port = private_info["pgsql_port"]  # 数据库端口
+            pgsql_user = private_info.get("pgsql_user")  # 数据库操作用户
+            pgsql_password = private_info.get("pgsql_password")  # 数据库操作用户密码
+            database_name = private_info.get("database_name")  # 数据库名称
+            pgsql_host = private_info.get("pgsql_host")  # 数据库主机
+            pgsql_port = private_info.get("pgsql_port")  # 数据库端口
             self.pool = (
                 await asyncpg.create_pool(  # 创建数据库连接池，可以异步访问数据库
                     user=pgsql_user,  # 数据库操作用户

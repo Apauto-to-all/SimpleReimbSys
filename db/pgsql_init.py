@@ -7,4 +7,4 @@ import logging
 # 获取日志记录器
 logger = logging.getLogger(__name__)
 
-# 
+# 连接数据库，创建表
