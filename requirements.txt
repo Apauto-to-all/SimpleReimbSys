@@ -1,0 +1,9 @@
+fastapi
+asyncpg
+bcrypt
+PyJWT
+captcha
+pytz
+uvicorn
+jinja2
+python-multipart
