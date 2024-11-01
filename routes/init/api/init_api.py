@@ -41,7 +41,7 @@ async def init(
     ):
         return JSONResponse(content={"error": "请填写完整信息"}, status_code=400)
     # 尝试连接数据库，创建表，写入数据库连接信息到配置文件
-    if init_utils.is_connectable(
+    if await init_utils.is_connectable(
         pgsql_host, pgsql_port, pgsql_user, pgsql_password, database_name
     ):
         # 重启 FastAPI 应用程序

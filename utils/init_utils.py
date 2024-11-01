@@ -12,11 +12,13 @@ pg_init = PgsqlInit()  # 创建 PgsqlInit 对象
 
 
 # 测试是否能够连接数据库，创建表，写入数据库连接信息到配置文件
-def is_connectable(pgsql_host, pgsql_port, pgsql_user, pgsql_password, database_name):
-    if pg_init.is_connectable(
+async def is_connectable(
+    pgsql_host, pgsql_port, pgsql_user, pgsql_password, database_name
+):
+    if await pg_init.is_connectable(
         pgsql_host, pgsql_port, pgsql_user, pgsql_password, database_name
     ):  # 测试是否能够连接数据库
-        pg_init.create_table()  # 创建表
+        await pg_init.create_table()  # 创建表
         private_info = {
             "pgsql_host": pgsql_host,
             "pgsql_port": pgsql_port,
