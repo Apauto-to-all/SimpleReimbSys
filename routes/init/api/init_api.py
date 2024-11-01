@@ -24,14 +24,7 @@ router = APIRouter()
 templates = Jinja2Templates(directory="templates")
 
 
-@router.get("/init", response_class=HTMLResponse)
-async def init(request: Request):
-    if init_utils.check_private_info():
-        return RedirectResponse(url="/index", status_code=303)
-    return templates.TemplateResponse("init.html", {"request": request})
-
-
-@router.post("/init")
+@router.post("/init/api")
 async def init(
     pgsql_host: str = Form(...),
     pgsql_port: int = Form(...),
@@ -39,8 +32,6 @@ async def init(
     pgsql_password: str = Form(...),
     database_name: str = Form(...),
 ):
-    if init_utils.check_private_info():
-        return RedirectResponse(url="/index", status_code=303)
     if (
         not pgsql_host
         or not pgsql_port
@@ -49,16 +40,15 @@ async def init(
         or not database_name
     ):
         return JSONResponse(content={"error": "请填写完整信息"}, status_code=400)
-    # 尝试连接数据库
-    pass
-    # 如果连接成功，写入配置文件
-    init_utils.write_private_info(
+    # 尝试连接数据库，创建表，写入数据库连接信息到配置文件
+    if init_utils.is_connectable(
         pgsql_host, pgsql_port, pgsql_user, pgsql_password, database_name
-    )
-    # 重启 FastAPI 应用程序
-    try:
-        # 重新启动当前的 Python 进程
-        subprocess.Popen([sys.executable] + sys.argv)
-        os._exit(0)
-    except Exception as e:
-        return {"error": str(e)}
+    ):
+        # 重启 FastAPI 应用程序
+        try:
+            # 重新启动当前的 Python 进程
+            subprocess.Popen([sys.executable] + sys.argv)
+            os._exit(0)
+        except Exception as e:
+            return {"error": str(e)}
+    return JSONResponse(content={"error": "提供连接信息不正确"}, status_code=400)

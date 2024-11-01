@@ -45,22 +45,37 @@ if init_utils.check_private_info():
     # 获取所有 Python 文件的模块路径
     for dirpath, _, filenames in os.walk(root_dir):
         for filename in filenames:
-            if filename.endswith(".py") and filename != "init.py":
+            if (
+                filename.endswith(".py")
+                and filename != "init.py"
+                and filename != "init_api.py"
+            ):
                 # 构建模块路径
                 module_path = os.path.join(dirpath, filename)
                 module_name = module_path.replace(os.sep, ".")[:-3]  # 去掉 ".py" 扩展名
                 module = importlib.import_module(module_name)  # 导入模块
                 app.include_router(module.router)  # 注册路由
+
+    # 添加全局中间件，如果已经初始化，跳转到首页
+    @app.middleware("http")
+    async def redirect_to_init(request: Request, call_next):
+        if request.url.path in ["/init"]:
+            return RedirectResponse(url="/index", status_code=303)
+        response = await call_next(request)
+        return response
+
 else:
     # 注册初始化路由
-    from routes import init
+    from routes.init import init
+    from routes.init.api import init_api
 
     app.include_router(init.router)
+    app.include_router(init_api.router)
 
     # 添加全局中间件，如果没有初始化，跳转到初始化页面
     @app.middleware("http")
     async def redirect_to_init(request: Request, call_next):
-        if request.url.path != "/init":
+        if request.url.path not in ["/init", "/init/api", "/favicon.ico"]:
             return RedirectResponse(url="/init")
         response = await call_next(request)
         return response
