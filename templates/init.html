@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>简易财务报销系统</title>
+    <link rel="stylesheet" href="/layui/css/layui.css">
+    <style>
+        .center-container {
+            max-width: 500px;
+            margin: 50px auto;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            width: 60%;
+            height: 600px;
+        }
+    </style>
+</head>
+
+<body style="background-color: #f0f0f0;">
+    <div class="layui-container center-container">
+        <h1 style="text-align: center;">数据库连接初始化</h1>
+        <p style="text-align: center; margin: 20px;">请填写数据库连接信息</p>
+        <form class="layui-form" action="/init/api" method="post">
+            <div class="layui-form-item">
+                <label class="layui-form-label">主机</label>
+                <div class="layui-input-block">
+                    <input type="text" name="pgsql_host" required lay-verify="required" placeholder="请输入数据库主机"
+                        autocomplete="off" class="layui-input">
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">端口</label>
+                <div class="layui-input-block">
+                    <input type="number" name="pgsql_port" required lay-verify="required|number" placeholder="请输入数据库端口"
+                        autocomplete="off" class="layui-input" value="5432">
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">用户名</label>
+                <div class="layui-input-block">
+                    <input type="text" name="pgsql_user" required lay-verify="required" placeholder="请输入数据库用户名"
+                        autocomplete="off" class="layui-input">
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">密码</label>
+                <div class="layui-input-block">
+                    <input type="password" name="pgsql_password" required lay-verify="required" placeholder="请输入数据库密码"
+                        autocomplete="off" class="layui-input">
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">数据库名</label>
+                <div class="layui-input-block">
+                    <input type="text" name="database_name" required lay-verify="required" placeholder="请输入数据库名"
+                        autocomplete="off" class="layui-input">
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <div class="layui-input-block">
+                    <button class="layui-btn" lay-submit lay-filter="formSubmit">立即提交</button>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <script src="/layui/layui.js"></script>
+    <script>
+        layui.use(['form', 'layer'], function () {
+            var form = layui.form;
+            var layer = layui.layer;
+
+            // 监听提交
+            form.on('submit(formSubmit)', function (data) {
+                // 阻止默认提交
+                $.ajax({
+                    type: 'POST',
+                    url: '/init/api',
+                    data: data.field,
+                    success: function (res) {
+                        layer.msg('初始化成功，正在重启...');
+                        setTimeout(function () {
+                            window.location.href = '/';
+                        }, 2000);
+                    },
+                    error: function (xhr) {
+                        var res = JSON.parse(xhr.responseText);
+                        layer.msg('错误：' + res.error);
+                    }
+                });
+                return false;
+            });
+        });
+    </script>
+</body>
+
+</html>

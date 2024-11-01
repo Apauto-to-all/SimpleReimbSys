@@ -75,7 +75,7 @@ else:
     # 添加全局中间件，如果没有初始化，跳转到初始化页面
     @app.middleware("http")
     async def redirect_to_init(request: Request, call_next):
-        if request.url.path not in ["/init", "/init/api", "/favicon.ico"]:
+        if request.url.path == "/index":
             return RedirectResponse(url="/init")
         response = await call_next(request)
         return response

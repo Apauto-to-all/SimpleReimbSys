@@ -1,0 +1,4 @@
+{
+    "liveServer.settings.port": 5536,
+    "css.styleSheets": ["layui/**/*.css", "static/**/*.css"],
+}
