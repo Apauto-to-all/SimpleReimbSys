@@ -27,7 +27,7 @@ async def is_connectable(
             "database_name": database_name,
         }
     with open(config.private_info_json, "w") as f:
-        json.dump(private_info, f)
+        json.dump(private_info, f, indent=4, ensure_ascii=False)
     logger.info("写入数据库连接信息到配置文件")
     return True
 

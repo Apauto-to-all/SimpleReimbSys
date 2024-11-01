@@ -59,7 +59,7 @@ if init_utils.check_private_info():
     # 添加全局中间件，如果已经初始化，跳转到首页
     @app.middleware("http")
     async def redirect_to_init(request: Request, call_next):
-        if request.url.path in ["/init"]:
+        if request.url.path in ["/init", "/init/api"]:
             return RedirectResponse(url="/index", status_code=303)
         response = await call_next(request)
         return response
