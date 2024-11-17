@@ -26,4 +26,4 @@ templates = Jinja2Templates(directory="templates")
 
 @router.get("/init", response_class=HTMLResponse)
 async def init(request: Request):
-    return templates.TemplateResponse("init.html", {"request": request})
+    return templates.TemplateResponse("init/init.html", {"request": request})

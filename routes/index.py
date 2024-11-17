@@ -19,4 +19,6 @@ templates = Jinja2Templates(directory="templates")
 
 @router.get("/index", response_class=HTMLResponse)
 async def index(request: Request, blog_type: Optional[str] = None):
-    pass
+    return templates.TemplateResponse(
+        "index.html", {"request": request, "blog_type": blog_type}
+    )

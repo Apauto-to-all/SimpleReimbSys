@@ -4,6 +4,7 @@ import os
 import config
 import json
 from db.pgsql_init import PgsqlInit
+from utils import password_utils
 
 # 获取日志记录器
 logger = logging.getLogger(__name__)
@@ -19,17 +20,28 @@ async def is_connectable(
         pgsql_host, pgsql_port, pgsql_user, pgsql_password, database_name
     ):  # 测试是否能够连接数据库
         await pg_init.create_table()  # 创建表
+        # 插入初始数据
+        # 自动生成一个随机密码
+        admin_password = "admin"
+        hash_password = await password_utils.encrypt_password(admin_password)
+        await pg_init.insert_init_data(hash_password)
+        # 生成密匙的算法
+        import secrets
+
         private_info = {
             "pgsql_host": pgsql_host,
             "pgsql_port": pgsql_port,
             "pgsql_user": pgsql_user,
             "pgsql_password": pgsql_password,
             "database_name": database_name,
+            "SECRET_KEY": secrets.token_hex(32),
+            "login_time_minute": 36000,  # 登入时间分钟
         }
-    with open(config.private_info_json, "w") as f:
-        json.dump(private_info, f, indent=4, ensure_ascii=False)
-    logger.info("写入数据库连接信息到配置文件")
-    return True
+        with open(config.private_info_json, "w") as f:
+            json.dump(private_info, f, indent=4, ensure_ascii=False)
+        logger.info("写入数据库连接信息到配置文件")
+        return True
+    return False
 
 
 # 验证数据库连接信息
@@ -50,6 +62,8 @@ def check_private_info():
             and private_info.get("pgsql_user")
             and private_info.get("pgsql_password")
             and private_info.get("database_name")
+            and private_info.get("SECRET_KEY")
+            and private_info.get("login_time_minute")
         ):
             return True
         return False

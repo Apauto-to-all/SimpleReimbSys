@@ -4,6 +4,8 @@ import asyncpg  # 导入 asyncpg 模块，用于异步访问 PostgreSQL 数据�
 import asyncio
 import logging
 
+from .all_table import tables_json
+
 # 获取日志记录器
 logger = logging.getLogger(__name__)
 
@@ -71,32 +73,117 @@ class PgsqlInit:
                     await conn.close()
                 except Exception as e:
                     logger.error(f"连接到 PostgreSQL 服务器失败: {e}")
+                    error_info = traceback.format_exc()
+                    logger.error(error_info)
                     return False
         except Exception as e:
             logger.error(f"连接到 PostgreSQL 服务器失败: {e}")
+            error_info = traceback.format_exc()
+            logger.error(error_info)
             return False
 
-        self.conn = await asyncpg.connect(
-            host=self.pgsql_host,
-            port=self.pgsql_port,
-            user=self.pgsql_user,
-            password=self.pgsql_password,
-            database=self.database_name,
-        )
-        return True
+        try:  # 连接到指定数据库
+            self.conn = await asyncpg.connect(
+                host=self.pgsql_host,
+                port=self.pgsql_port,
+                user=self.pgsql_user,
+                password=self.pgsql_password,
+                database=self.database_name,
+            )
+            return True
+        except Exception as e:
+            logger.error(f"连接到 PostgreSQL 数据库失败: {e}")
+            error_info = traceback.format_exc()
+            logger.error(error_info)
+            return False
 
-    # 创建表
+    async def ensure_table_columns(self, table_name, columns):
+        # 检测表是否存在
+        table_exists = await self.conn.fetchval(
+            """
+            SELECT to_regclass($1)
+            """,
+            table_name,
+        )
+        if not table_exists:
+            # 表不存在，创建表
+            await self.conn.execute(
+                f"""
+                CREATE TABLE {table_name} (
+                    {", ".join(f"{k} {v}" for k, v in columns.items() if k != "primary_key")},
+                    PRIMARY KEY {columns["primary_key"]}
+                )
+                """
+            )
+        else:
+            # 表存在，检查列是否存在
+            existing_columns = await self.conn.fetch(
+                """
+                SELECT column_name
+                FROM information_schema.columns
+                WHERE table_name = $1
+                """,
+                table_name,
+            )
+            # 获取已存在的列名
+            existing_column_names = {row["column_name"] for row in existing_columns}
+            # 检查列是否存在，不存在就创建
+            for column_name, column_def in columns.items():
+                if (
+                    column_name not in existing_column_names
+                    and column_name != "primary_key"
+                ):
+                    await self.conn.execute(
+                        f"""
+                        ALTER TABLE {table_name}
+                        ADD COLUMN {column_name} {column_def}
+                        """
+                    )
+
     async def create_table(self):
-        # 创建表的 SQL 语句
-        sql = """
-        CREATE TABLE IF NOT EXISTS users (
-            
-        );
-        """
         try:
-            # 执行 SQL 语句
-            await self.conn.execute(sql)
+            # 创建表
+            for table_name, columns in tables_json.items():
+                await self.ensure_table_columns(table_name, columns)
             return True
         except Exception as e:
             logger.error(e)
+            error_info = traceback.format_exc()
+            logger.error(error_info)
+            return False
+
+    async def insert_init_data(self, admin_password):
+        # 插入初始数据
+        try:
+            # 创建角色：管理员，财务人员，报销人员（如果不存在）
+            roles = ["管理员", "财务人员", "报销人员"]
+            for role in roles:
+                await self.conn.execute(
+                    """
+                    INSERT INTO roles (role_name) 
+                    VALUES ($1)
+                    ON CONFLICT (role_name) DO NOTHING
+                """,
+                    role,
+                )
+
+            # 创建一个管理员账户（如果不存在）
+            await self.conn.execute(
+                """
+                INSERT INTO users (username, password, real_name, role_id)
+                VALUES ($1, $2, $3, (SELECT role_id FROM roles WHERE role_name = $4))
+                ON CONFLICT (username) DO NOTHING
+            """,
+                "admin",
+                admin_password,
+                "管理员",
+                "管理员",
+            )
+
+            await self.conn.close()
+            return True
+        except Exception as e:
+            logger.error(e)
+            error_info = traceback.format_exc()
+            logger.error(error_info)
             return False
