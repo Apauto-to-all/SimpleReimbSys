@@ -1,6 +1,7 @@
 import os
 import subprocess
 import sys
+import traceback
 import config
 from fastapi import (
     APIRouter,  # 功能：用于创建路由
@@ -8,6 +9,7 @@ from fastapi import (
     Cookie,  # 功能：用于操作 Cookie
     File,  # 功能：用于文件上传
     Form,  # 功能：用于表单提交
+    BackgroundTasks,  # 功能：用于后台任务
 )
 from fastapi.templating import Jinja2Templates  # 功能：用于渲染模板
 from fastapi.responses import HTMLResponse, JSONResponse
@@ -24,8 +26,14 @@ router = APIRouter()
 templates = Jinja2Templates(directory="templates")
 
 
+async def restart_server():
+    subprocess.Popen([sys.executable] + sys.argv)
+    os._exit(0)
+
+
 @router.post("/init/api")
 async def init(
+    background_tasks: BackgroundTasks,  # 添加 BackgroundTasks 参数
     pgsql_host: str = Form(...),
     pgsql_port: int = Form(...),
     pgsql_user: str = Form(...),
@@ -47,8 +55,15 @@ async def init(
         # 重启 FastAPI 应用程序
         try:
             # 重新启动当前的 Python 进程
-            subprocess.Popen([sys.executable] + sys.argv)
-            os._exit(0)
+            background_tasks.add_task(restart_server)
+            return JSONResponse(
+                content={"message": "初始化成功，服务器正在重启，点击确认刷新页面！"},
+                status_code=200,
+            )
         except Exception as e:
-            return {"error": str(e)}
+            logger.error(f"重启 FastAPI 应用程序失败: {e}")
+            logger.error(traceback.format_exc())
+            return JSONResponse(
+                content={"error": "重启 FastAPI 应用程序失败"}, status_code=400
+            )
     return JSONResponse(content={"error": "提供连接信息不正确"}, status_code=400)

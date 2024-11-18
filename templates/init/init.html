@@ -87,21 +87,20 @@
                     body: new URLSearchParams(field).toString(),
                 }).then(response => {
                     layer.close(loadingIndex); // 隐藏加载动画
-                    if (response.status == 400) {
-                        return response.json().then(json => {
+                    return response.json().then(json => {
+                        if (response.status != 200) {
                             layer.alert(json.error, {
                                 icon: 5
                             });
-                        });
-                    } else {
-                        // 点击确定刷新页面
-                        layer.alert('初始化成功！点击确定跳转主页', {
-                            icon: 6
-                        }, function () {
-                            location.reload();
-                        });
-
-                    }
+                        } else {
+                            // 使用后端返回的消息
+                            layer.alert(json.message, {
+                                icon: 6
+                            }, function () {
+                                location.reload();
+                            });
+                        }
+                    });
                 }).catch(err => {
                     console.error(err);
                 });

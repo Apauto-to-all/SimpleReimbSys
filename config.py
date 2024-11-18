@@ -9,7 +9,7 @@ host = "localhost"
 port = 19791
 
 # 私人信息，如数据库密码等
-private_info_json = "private_info.json"
+private_info_name = "private_info"  # 私人信息文件，py格式
 
 # 创建日志目录
 log_directory = "logs"

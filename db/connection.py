@@ -5,14 +5,27 @@ import asyncpg  # 导入 asyncpg 模块，用于异步访问 PostgreSQL 数据�
 import asyncio
 import logging
 import config
-import json
+
+import importlib
+
+private_info_path = config.private_info_name + ".py"
+if os.path.exists(private_info_path):
+    private_info = importlib.import_module(config.private_info_name)
+    pgsql_user = private_info.pgsql_user
+    pgsql_password = private_info.pgsql_password
+    pgsql_host = private_info.pgsql_host
+    pgsql_port = private_info.pgsql_port
+    database_name = private_info.database_name
+
 
 # 获取日志记录器
 logger = logging.getLogger(__name__)
 
+from .users import UserTable
+
 
 # 数据库操作类
-class DatabaseOperation:
+class DatabaseOperation(UserTable):
     _instance = None  # 单例模式
     error_mun = 0  # 错误次数
 
@@ -31,14 +44,6 @@ class DatabaseOperation:
         连接数据库，使用操作用户
         """
         try:
-            # 读取配置文件
-            with open(config.private_info_json, "r") as f:
-                private_info = json.load(f)
-            pgsql_user = private_info.get("pgsql_user")  # 数据库操作用户
-            pgsql_password = private_info.get("pgsql_password")  # 数据库操作用户密码
-            database_name = private_info.get("database_name")  # 数据库名称
-            pgsql_host = private_info.get("pgsql_host")  # 数据库主机
-            pgsql_port = private_info.get("pgsql_port")  # 数据库端口
             self.pool = (
                 await asyncpg.create_pool(  # 创建数据库连接池，可以异步访问数据库
                     user=pgsql_user,  # 数据库操作用户

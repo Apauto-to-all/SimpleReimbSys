@@ -1,10 +1,20 @@
 import os
+import sys
 import jwt  # 导入jwt模块
 from datetime import datetime, timedelta, timezone
 import bcrypt
-import json
+import secrets
+import config  # 导入config模块，用于获取配置信息
 
-import config  # 导入config模块
+import importlib
+
+import os
+
+private_info_path = config.private_info_name + ".py"
+if os.path.exists(private_info_path):
+    private_info = importlib.import_module(config.private_info_name)
+    SECRET_KEY = private_info.SECRET_KEY
+    login_time_minute = private_info.login_time_minute
 
 
 # 加密密码
@@ -43,16 +53,6 @@ async def get_access_jwt(user: str) -> str:
     :param user: 用户信息
     :return: JWT Token
     """
-    import secrets
-
-    SECRET_KEY = "SECRET_KEY"
-    login_time_minute = 36000  # 登入时间分钟
-    if os.path.exists(config.private_info_json):
-        with open(config.private_info_json, "r") as f:
-            private_info = json.load(f)
-            SECRET_KEY = private_info.get("SECRET_KEY")
-            login_time_minute = private_info.get("login_time_minute")
-
     payload = {
         "jti": secrets.token_hex(16),  # JWT ID
         "user": user,
@@ -71,11 +71,6 @@ async def get_user_from_jwt(token: str) -> str:
     :return: 用户信息，如果Token无效，返回None
     """
     try:
-        SECRET_KEY = "SECRET_KEY"
-        if os.path.exists(config.private_info_json):
-            with open(config.private_info_json, "r") as f:
-                private_info = json.load(f)
-                SECRET_KEY = private_info.get("SECRET_KEY")
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])  # 解码token
         return payload.get("user")  # 返回用户信息
     except jwt.ExpiredSignatureError:
