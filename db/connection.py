@@ -22,10 +22,11 @@ if os.path.exists(private_info_path):
 logger = logging.getLogger(__name__)
 
 from .users import UserTable
+from .users_admin import UsersAdminOperation
 
 
 # 数据库操作类
-class DatabaseOperation(UserTable):
+class DatabaseOperation(UserTable, UsersAdminOperation):
     _instance = None  # 单例模式
     error_mun = 0  # 错误次数
 

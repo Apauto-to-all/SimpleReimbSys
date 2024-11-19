@@ -13,19 +13,23 @@ logger = logging.getLogger(__name__)
 
 # 用户表相关的操作
 class UserTable:
-    # 查询用户表的所有数据
+
+    # 查询用户表的所有数据，包含角色名称
     async def user_select_all(self, username: str) -> dict:
         async with self.pool.acquire() as conn:
             try:
                 sql = """
-                SELECT * FROM users WHERE username = $1;
+                SELECT users.username, users.password, users.real_name, users.role_id, roles.role_name
+                FROM users
+                LEFT JOIN roles
+                ON users.role_id = roles.role_id
+                WHERE users.username = $1
                 """
                 result = await conn.fetchrow(sql, username)
                 return result
             except Exception as e:
-                error_info = traceback.format_exc()
-                logger.error(error_info)
                 logger.error(e)
+                logger.error(traceback.format_exc())
                 return {}
 
     # 查询用户是否存在
@@ -40,7 +44,6 @@ class UserTable:
                     return True
                 return False
             except Exception as e:
-                error_info = traceback.format_exc()
-                logger.error(error_info)
                 logger.error(e)
+                logger.error(traceback.format_exc())
                 return False
