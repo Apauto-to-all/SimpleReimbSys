@@ -15,7 +15,7 @@ from typing import Optional  # 功能：用于声明可选参数
 
 import logging
 
-from utils import login_utils, creat_utils
+from utils import account_utils, login_utils
 
 logger = logging.getLogger(__name__)
 
@@ -47,7 +47,7 @@ async def create_finance_account(
         return JSONResponse(content={"message": "没有权限"}, status_code=400)
 
     # 判断用户名是否存在
-    if creat_utils.check_username_exist(username):
+    if account_utils.check_username_exist(username):
         return JSONResponse(content={"message": "用户名已存在"}, status_code=400)
 
     # 判断密码是否一致
@@ -59,7 +59,7 @@ async def create_finance_account(
         return JSONResponse(content={"message": "角色不合法"}, status_code=400)
 
     # 创建账户
-    if creat_utils.create_account(username, password, real_name, role_name):
+    if account_utils.create_account(username, password, real_name, role_name):
         return JSONResponse(content={"message": "创建账户成功"}, status_code=200)
 
     return JSONResponse(content={"message": "创建账户失败"}, status_code=400)
