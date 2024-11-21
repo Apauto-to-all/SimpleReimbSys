@@ -5,24 +5,13 @@
     <meta charset="utf-8">
     <title>简易财务报销系统</title>
     <link rel="stylesheet" href="/layui/css/layui.css">
-    <style>
-        .center-container {
-            max-width: 500px;
-            margin: 50px auto;
-            background-color: #fff;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-            width: 60%;
-            height: 600px;
-        }
-    </style>
+    <link rel="stylesheet" href="/static/css/style.css">
 </head>
 
-<body style="background-color: #f0f0f0;">
+<body>
     <div class="layui-container center-container">
-        <h1 style="text-align: center;">数据库连接初始化</h1>
-        <p style="text-align: center; margin: 20px;">请填写数据库连接信息</p>
+        <h1>数据库连接初始化</h1>
+        <p>请填写数据库连接信息</p>
         <form class="layui-form" action="/init/api" method="post">
             <div class="layui-form-item">
                 <label class="layui-form-label">主机</label>
