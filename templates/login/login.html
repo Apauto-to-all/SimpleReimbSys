@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>简易财务报销系统 - 登录</title>
+    <link rel="stylesheet" href="/layui/css/layui.css">
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+
+<body>
+    <div class="layui-container center-container">
+        <h1>简易财务报销系统</h1>
+        <h2>用户登录</h2>
+        <form class="layui-form">
+            <!-- 用户名 -->
+            <div class="layui-form-item">
+                <div class="layui-input-wrap">
+                    <div class="layui-input-prefix">
+                        <i class="layui-icon layui-icon-username"></i>
+                    </div>
+                    <input type="text" name="username" value="" lay-verify="required" placeholder="用户名"
+                        lay-reqtext="请填写用户名" autocomplete="off" class="layui-input" lay-affix="clear">
+                </div>
+            </div>
+            <!-- 密码 -->
+            <div class="layui-form-item">
+                <div class="layui-input-wrap">
+                    <div class="layui-input-prefix">
+                        <i class="layui-icon layui-icon-password"></i>
+                    </div>
+                    <input type="password" name="password" value="" lay-verify="required" placeholder="密   码"
+                        lay-reqtext="请填写密码" autocomplete="off" class="layui-input" lay-affix="eye">
+                </div>
+            </div>
+            <!-- 验证码 -->
+            <div class="layui-form-item">
+                <div class="layui-row">
+                    <div class="layui-col-xs7">
+                        <div class="layui-input-wrap">
+                            <div class="layui-input-prefix">
+                                <i class="layui-icon layui-icon-vercode"></i>
+                            </div>
+                            <input type="text" name="captcha" value="" lay-verify="required" placeholder="验证码"
+                                lay-reqtext="请填写验证码" autocomplete="off" class="layui-input" lay-affix="clear">
+                        </div>
+                    </div>
+                    <div class="layui-col-xs5">
+                        <div style="margin-left: 10px;">
+                            <img style="width: auto; height: auto;" src="/login/img/captcha" alt="验证码"
+                                onclick="this.src='/login/img/captcha?t='+ new Date().getTime();">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- 记住密码，或忘记密码 -->
+            <div class="layui-form-item">
+                <input type="checkbox" name="remember" lay-skin="primary" title="记住密码">
+            </div>
+            <!-- 登入按钮 -->
+            <div class="layui-form-item">
+                <button class="layui-btn layui-btn-fluid" lay-submit lay-filter="formSubmit">登录</button>
+            </div>
+        </form>
+    </div>
+
+    <script src="/layui/layui.js"></script>
+    <script>
+        layui.use(['form', 'layer'], function () {
+            var form = layui.form;
+            var layer = layui.layer;
+
+            // 监听提交
+            form.on('submit(formSubmit)', function (data) {
+                // 显示加载动画
+                var loadingIndex = layer.load(2, { shade: [0.1, '#fff'] }); // 显示加载动画
+
+                var field = data.field; // 获取表单字段值
+                fetch('/login/api', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                    body: new URLSearchParams(field).toString(),
+                    credentials: 'include', // 包含 Cookie
+                }).then(response => {
+                    layer.close(loadingIndex); // 隐藏加载动画
+                    if (response.redirected) {
+                        // 登录成功，重定向到首页
+                        window.location.href = response.url;
+                    } else {
+                        return response.json().then(json => {
+                            if (response.status != 200) {
+                                layer.alert(json.error, {
+                                    icon: 5
+                                });
+                            } else {
+                                layer.alert('登录成功', {
+                                    icon: 6
+                                }, function () {
+                                    window.location.href = '/index';
+                                });
+                            }
+                        });
+                    }
+                }).catch(err => {
+                    layer.close(loadingIndex); // 确保隐藏加载动画
+                    console.error(err);
+                    layer.alert('请求失败，请稍后再试。', {
+                        icon: 5
+                    });
+                });
+                return false;
+            });
+        });
+    </script>
+</body>
+
+</html>
