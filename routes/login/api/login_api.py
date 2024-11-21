@@ -63,3 +63,11 @@ async def login(
             value=await password_utils.get_access_jwt(username),  # 设置 Cookie 的值
         )
     return response
+
+
+# 登出api
+@router.get("/login/api/logout")
+async def logout():
+    response = RedirectResponse("/login", status_code=302)
+    response.delete_cookie(key="access_token")  # 删除 Cookie
+    return response

@@ -26,7 +26,7 @@ async def create_account(
     :return: 创建账户成功返回True，创建账户失败返回False
     """
     try:
-        if operate.user_insert(
+        if await operate.user_insert(
             username, password_utils.get_password(password), real_name, role_name
         ):
             return True
@@ -44,7 +44,7 @@ async def check_username_exist(username: str) -> bool:
     :return: 用户名存在返回True，用户名不存在返回False
     """
     try:
-        if operate.user_is_exist(username):
+        if await operate.user_is_exist(username):
             return True
     except Exception as e:
         logger.error(e)
@@ -66,7 +66,7 @@ async def saerch_user_info(
     :return: 用户信息列表
     """
     try:
-        return operate.user_admin_search_list(
+        return await operate.user_admin_search_list(
             page, limit, username, real_name, role_name
         )
     except Exception as e:

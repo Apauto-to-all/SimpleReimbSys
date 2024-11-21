@@ -19,9 +19,9 @@ async def is_admin(access_token: str) -> bool:
     """
     try:
         if access_token:
-            username = password_utils.get_user_from_jwt(access_token)
+            username = await password_utils.get_user_from_jwt(access_token)
             if username:
-                user_dict = operate.user_select_all(username)
+                user_dict = await operate.user_select_all(username)
                 if user_dict:
                     if user_dict.get("role_name") == "管理员":
                         return True
@@ -40,9 +40,9 @@ async def is_login(access_token: str) -> bool:
     """
     try:
         if access_token:
-            username = password_utils.get_user_from_jwt(access_token)
+            username = await password_utils.get_user_from_jwt(access_token)
             if username:
-                if operate.user_is_exist(username):
+                if await operate.user_is_exist(username):
                     return True
     except Exception as e:
         logger.error(e)
@@ -59,9 +59,11 @@ async def verify_login(username: str, password: str) -> bool:
     :return: 登入成功返回True，登入失败返回False
     """
     try:
-        user_dict = operate.user_select_all(username)
+        user_dict = await operate.user_select_all(username)
         if user_dict:
-            if password_utils.verify_password(user_dict.get("password"), password):
+            if await password_utils.verify_password(
+                user_dict.get("password"), password
+            ):
                 return True
     except Exception as e:
         logger.error(e)
