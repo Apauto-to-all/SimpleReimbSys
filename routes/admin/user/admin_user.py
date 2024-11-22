@@ -19,15 +19,15 @@ router = APIRouter()
 templates = Jinja2Templates(directory="templates")
 
 
-@router.get("/index", response_class=HTMLResponse)
-async def index(
+# 用户管理页面
+@router.get("/admin/user", response_class=HTMLResponse)
+async def admin_user(
     request: Request,
     access_token: Optional[str] = Cookie(None),
 ):
-    # 检测是否登录
-    role_name = await role_utils.get_role(access_token)
-    if role_name:
+    if await role_utils.is_admin(access_token):
         return templates.TemplateResponse(
-            "index.html", {"request": request, "role_name": role_name}
+            "admin/admin_user.html",
+            {"request": request, "role_name": "管理员"},
         )
-    return RedirectResponse("/login", status_code=302)
+    return RedirectResponse("/index", status_code=302)

@@ -10,27 +10,6 @@ from utils import password_utils
 operate = DatabaseOperation()
 
 
-# 判断是否为管理员
-async def is_admin(access_token: str) -> bool:
-    """
-    判断是否为管理员
-    :param access_token: 访问令牌
-    :return: 是管理员返回True，不是管理员返回False
-    """
-    try:
-        if access_token:
-            username = await password_utils.get_user_from_jwt(access_token)
-            if username:
-                user_dict = await operate.user_select_all(username)
-                if user_dict:
-                    if user_dict.get("role_name") == "管理员":
-                        return True
-    except Exception as e:
-        logger.error(e)
-        logger.error(traceback.format_exc())
-    return False
-
-
 # 判断是否登入
 async def is_login(access_token: str) -> bool:
     """

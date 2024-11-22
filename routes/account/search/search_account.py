@@ -16,7 +16,7 @@ from typing import Optional  # 功能：用于声明可选参数
 
 import logging
 
-from utils import account_utils, login_utils
+from utils import account_utils, login_utils, role_utils
 
 logger = logging.getLogger(__name__)
 
@@ -33,7 +33,7 @@ async def search_account(
     role_name: Optional[str] = Query(""),  # 角色
     access_token: Optional[str] = Cookie(None),
 ):
-    if not await login_utils.is_admin(access_token):
+    if not await role_utils.is_admin(access_token):
         return RedirectResponse("/login", status_code=302)
     count, list_data = await account_utils.saerch_user_info(
         page, limit, username, real_name, role_name
