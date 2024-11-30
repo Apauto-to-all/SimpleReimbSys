@@ -82,6 +82,27 @@
         layui.use('element', function () {
             var element = layui.element;
         });
+        document.addEventListener('DOMContentLoaded', function () {
+            // 获取当前路径
+            var currentPath = window.location.pathname;
+            // 设置高亮
+            function setActiveNav(navClass) {
+                var navList = document.querySelector(navClass).getElementsByTagName('li');
+                for (var i = 0; i < navList.length; i++) {
+                    var anchor = navList[i].getElementsByTagName('a')[0];
+                    var href = anchor.getAttribute('href');
+                    // 使用 startsWith 支持子路径高亮
+                    if (currentPath === href || currentPath.startsWith(href + '/')) {
+                        navList[i].classList.add('layui-this');
+                        return;
+                    }
+                }
+            }
+            // 设置顶部导航高亮，选择具有 'layui-layout-left' 类的导航
+            setActiveNav('.layui-layout-left');
+            // 设置侧边栏导航高亮，选择具有 'layui-nav-tree' 类的导航
+            setActiveNav('.layui-nav-tree');
+        });
     </script>
 </body>
 
