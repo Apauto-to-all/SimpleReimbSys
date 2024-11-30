@@ -19,7 +19,7 @@ router = APIRouter()
 templates = Jinja2Templates(directory="templates")
 
 
-# 用户管理页面
+# 管理账户界面
 @router.get("/admin/user", response_class=HTMLResponse)
 async def admin_user(
     request: Request,

@@ -24,7 +24,7 @@ templates = Jinja2Templates(directory="templates")
 
 
 # 创建账户，管理员创建财务人员账户，报销人员账户
-@router.post("/account/api/create_account")
+@router.post("/admin/user/api/create_account")
 async def create_finance_account(
     username: str = Form(...),  # 用户名
     password: str = Form(...),  # 密码
