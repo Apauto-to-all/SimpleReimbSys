@@ -26,11 +26,11 @@ templates = Jinja2Templates(directory="templates")
 # 创建账户，管理员创建财务人员账户，报销人员账户
 @router.post("/admin/user/api/create_account")
 async def create_finance_account(
-    username: str = Form(...),  # 用户名
-    password: str = Form(...),  # 密码
-    confirm_password: str = Form(...),  # 确认密码
-    real_name: str = Form(...),  # 真实姓名
-    role_name: str = Form(...),  # 角色
+    username: str = Form(""),  # 用户名
+    password: str = Form(""),  # 密码
+    confirm_password: str = Form(""),  # 确认密码
+    real_name: str = Form(""),  # 真实姓名
+    role_name: str = Form(""),  # 角色
     access_token: Optional[str] = Cookie(None),  # 访问令牌
 ):
     if (
@@ -60,7 +60,7 @@ async def create_finance_account(
         return JSONResponse(content={"message": "角色不合法"}, status_code=400)
 
     # 创建账户
-    if account_utils.create_account(username, password, real_name, role_name):
+    if await account_utils.create_account(username, password, real_name, role_name):
         return JSONResponse(content={"message": "创建账户成功"}, status_code=200)
 
     return JSONResponse(content={"message": "创建账户失败"}, status_code=400)

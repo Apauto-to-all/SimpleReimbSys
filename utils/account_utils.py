@@ -27,7 +27,10 @@ async def create_account(
     """
     try:
         if await operate.user_insert(
-            username, password_utils.get_password(password), real_name, role_name
+            username,
+            await password_utils.encrypt_password(password),
+            real_name,
+            role_name,
         ):
             return True
     except Exception as e:
