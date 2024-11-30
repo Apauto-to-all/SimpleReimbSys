@@ -11,7 +11,7 @@ from typing import Optional  # 功能：用于声明可选参数
 
 import logging  # 功能：用于记录日志
 
-from utils import login_utils, role_utils
+from utils import login_utils, user_utils  # 导入工具模块
 
 logger = logging.getLogger(__name__)
 
@@ -25,9 +25,10 @@ async def admin_user(
     request: Request,
     access_token: Optional[str] = Cookie(None),
 ):
-    if await role_utils.is_admin(access_token):
+    user_dict = await user_utils.user_select_all(access_token)
+    if user_dict.get("role_name") == "管理员":
         return templates.TemplateResponse(
             "admin/admin_user.html",
-            {"request": request, "role_name": "管理员"},
+            {"request": request, "user_dict": user_dict},
         )
     return RedirectResponse("/index", status_code=302)

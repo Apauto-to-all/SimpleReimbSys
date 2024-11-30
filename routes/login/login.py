@@ -16,7 +16,7 @@ from typing import Optional  # 功能：用于声明可选参数
 
 import logging
 
-from utils import login_utils
+from utils import login_utils, user_utils
 
 logger = logging.getLogger(__name__)
 
@@ -29,7 +29,7 @@ async def init(
     request: Request,
     access_token: Optional[str] = Cookie(None),
 ):
-    if await login_utils.is_login(access_token):
+    if await user_utils.user_select_all(access_token):
         # 如果已经登入，就重定向到首页
         return RedirectResponse("/index", status_code=302)
     return templates.TemplateResponse("login/login.html", {"request": request})

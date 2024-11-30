@@ -19,7 +19,7 @@ class UserTable:
         async with self.pool.acquire() as conn:
             try:
                 sql = """
-                SELECT users.username, users.password, users.real_name, users.role_id, roles.role_name
+                SELECT users.user_id, users.username, users.password, users.real_name, users.role_id, roles.role_name
                 FROM users
                 LEFT JOIN roles
                 ON users.role_id = roles.role_id
@@ -31,19 +31,3 @@ class UserTable:
                 logger.error(e)
                 logger.error(traceback.format_exc())
                 return {}
-
-    # 查询用户是否存在
-    async def user_is_exist(self, username: str):
-        async with self.pool.acquire() as conn:
-            try:
-                sql = """
-                SELECT username FROM users WHERE username = $1;
-                """
-                result = await conn.fetch(sql, username)
-                if result:
-                    return True
-                return False
-            except Exception as e:
-                logger.error(e)
-                logger.error(traceback.format_exc())
-                return False

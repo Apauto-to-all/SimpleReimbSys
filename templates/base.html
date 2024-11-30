@@ -26,6 +26,9 @@
                     <a href="/contact">联系</a>
                 </li>
             </ul>
+            <ul class="layui-nav layui-layout-right">
+
+            </ul>
         </div>
 
         <!-- 侧边栏 -->
@@ -33,7 +36,7 @@
             <div class="layui-side-scroll">
                 <!-- 左侧导航区 -->
                 <ul class="layui-nav layui-nav-tree" lay-filter="test" id="nav">
-                    {% if role_name == "管理员" %}
+                    {% if user_dict.role_name == "管理员" %}
                     <li class="layui-nav-item">
                         <a href="/admin/user"><i class="layui-icon layui-icon-user"></i> 用户管理</a>
                     </li>
@@ -43,11 +46,11 @@
                     <li class="layui-nav-item">
                         <a href="/admin/project"><i class="layui-icon layui-icon-app"></i> 项目管理</a>
                     </li>
-                    {% elif role_name == "报销人员" %}
+                    {% elif user_dict.role_name == "报销人员" %}
                     <li class="layui-nav-item">
                         <a href="/finance/reimbursement"><i class="layui-icon layui-icon-form"></i> 报销管理</a>
                     </li>
-                    {% elif role_name == "财务人员" %}
+                    {% elif user_dict.role_name == "财务人员" %}
                     <li class="layui-nav-item">
                         <a href="/user/project"><i class="layui-icon layui-icon-app"></i> 项目管理</a>
                     </li>

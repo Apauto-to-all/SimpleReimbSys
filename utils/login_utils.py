@@ -10,25 +10,6 @@ from utils import password_utils
 operate = DatabaseOperation()
 
 
-# 判断是否登入
-async def is_login(access_token: str) -> bool:
-    """
-    判断是否登入
-    :param access_token: 访问令牌
-    :return: 登入返回True，未登入返回False
-    """
-    try:
-        if access_token:
-            username = await password_utils.get_user_from_jwt(access_token)
-            if username:
-                if await operate.user_is_exist(username):
-                    return True
-    except Exception as e:
-        logger.error(e)
-        logger.error(traceback.format_exc())
-    return False
-
-
 # 用户登入，验证用户名和密码
 async def verify_login(username: str, password: str) -> bool:
     """

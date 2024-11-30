@@ -15,7 +15,7 @@ from typing import Optional  # 功能：用于声明可选参数
 
 import logging
 
-from utils import account_utils, login_utils, role_utils
+from utils import account_utils, login_utils, user_utils
 
 logger = logging.getLogger(__name__)
 
@@ -43,11 +43,12 @@ async def create_finance_account(
         return JSONResponse(content={"message": "请填写完整信息"}, status_code=400)
 
     # 检测是否为管理员
-    if not await role_utils.is_admin(access_token):
+    user_dict = await user_utils.user_select_all(access_token)
+    if not user_dict.get("role_name") == "管理员":
         return JSONResponse(content={"message": "没有权限"}, status_code=400)
 
     # 判断用户名是否存在
-    if account_utils.check_username_exist(username):
+    if await account_utils.check_username_exist(username):
         return JSONResponse(content={"message": "用户名已存在"}, status_code=400)
 
     # 判断密码是否一致
