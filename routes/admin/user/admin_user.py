@@ -28,7 +28,37 @@ async def admin_user(
     user_dict = await user_utils.user_select_all(access_token)
     if user_dict.get("role_name") == "管理员":
         return templates.TemplateResponse(
-            "admin/admin_user.html",
+            "admin/user/admin_user.html",
+            {"request": request, "user_dict": user_dict},
+        )
+    return RedirectResponse("/index", status_code=302)
+
+
+# 创建用户界面
+@router.get("/admin/user/create", response_class=HTMLResponse)
+async def admin_user_create(
+    request: Request,
+    access_token: Optional[str] = Cookie(None),
+):
+    user_dict = await user_utils.user_select_all(access_token)
+    if user_dict.get("role_name") == "管理员":
+        return templates.TemplateResponse(
+            "admin/user/create_user.html",
+            {"request": request, "user_dict": user_dict},
+        )
+    return RedirectResponse("/index", status_code=302)
+
+
+# 查询用户界面
+@router.get("/admin/user/query", response_class=HTMLResponse)
+async def admin_user_query(
+    request: Request,
+    access_token: Optional[str] = Cookie(None),
+):
+    user_dict = await user_utils.user_select_all(access_token)
+    if user_dict.get("role_name") == "管理员":
+        return templates.TemplateResponse(
+            "admin/user/query_user.html",
             {"request": request, "user_dict": user_dict},
         )
     return RedirectResponse("/index", status_code=302)

@@ -38,7 +38,13 @@
                 <ul class="layui-nav layui-nav-tree" lay-filter="test" id="nav">
                     {% if user_dict.role_name == "管理员" %}
                     <li class="layui-nav-item">
-                        <a href="/admin/user"><i class="layui-icon layui-icon-user"></i> 用户管理</a>
+                        <a href="javascript:;">
+                            <i class="layui-icon layui-icon-user"></i> 用户管理
+                        </a>
+                        <dl class="layui-nav-child">
+                            <dd><a href="/admin/user/create">创建用户</a></dd>
+                            <dd><a href="/admin/user/query">查询用户</a></dd>
+                        </dl>
                     </li>
                     <li class="layui-nav-item">
                         <a href="/admin/category"><i class="layui-icon layui-icon-set"></i> 报销类别管理</a>
@@ -95,6 +101,17 @@
                     if (currentPath === href || currentPath.startsWith(href + '/')) {
                         navList[i].classList.add('layui-this');
                         return;
+                    }
+                    // 查询子菜单
+                    var subNavList = navList[i].querySelectorAll('dd');
+                    for (var j = 0; j < subNavList.length; j++) {
+                        var subAnchor = subNavList[j].getElementsByTagName('a')[0];
+                        var subHref = subAnchor.getAttribute('href');
+                        if (currentPath === subHref || currentPath.startsWith(subHref + '/')) {
+                            navList[i].classList.add('layui-nav-itemed');
+                            subNavList[j].classList.add('layui-this');
+                            return;
+                        }
                     }
                 }
             }
