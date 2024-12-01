@@ -1,0 +1,123 @@
+{% extends 'base.html' %}
+
+{% block title %}管理员 - 创建报销(项目)类别{% endblock %}
+
+{% block content %}
+<!-- 创建报销(项目)类别 -->
+<div>
+    <h1>创建报销(项目)类别</h1>
+
+    <form class="layui-form" action="/admin/category/api/create" method="post" style="padding: 20px;">
+        <!-- 类别名称和按钮 -->
+        <div class="layui-form-item layui-inline">
+            <div class="layui-input-wrap">
+                <div class="layui-input-prefix">
+                    <i class="layui-icon layui-icon-form"></i>
+                </div>
+                <input type="text" name="category_name" lay-verify="required" placeholder="类别名称" lay-reqtext="请填写类别名称"
+                    autocomplete="off" class="layui-input" lay-affix="clear">
+            </div>
+        </div>
+        <!-- 提交按钮 -->
+        <div class="layui-form-item layui-inline">
+            <div class="layui-input-wrap">
+                <button class="layui-btn" lay-submit lay-filter="createCategory">创建</button>
+            </div>
+        </div>
+    </form>
+
+    <script>
+        layui.use(function () {
+            var layer = layui.layer;
+            var form = layui.form;
+
+            // 监听提交
+            form.on('submit(createCategory)', function (data) {
+                // 加载动画
+                var loading = layer.load(2);
+                fetch('/admin/category/api/create', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded'
+                    },
+                    body: new URLSearchParams(data.field)
+                })
+                    .then(response => {
+                        layer.close(loading);
+                        if (response.status == 200) {
+                            return response.json().then(res => {
+                                layer.msg(res.message, { icon: 1 });
+                            });
+                        } else {
+                            return response.json().then(res => {
+                                layer.alert(res.message, { icon: 2 });
+                            });
+                        }
+                    }).catch(err => {
+                        layer.close(loading);
+                        console.error(err);
+                        layer.alert('请求失败，请稍后再试。', {
+                            icon: 5
+                        });
+                    });
+                return false; // 阻止表单默认提交
+            });
+        });
+    </script>
+</div>
+
+<!-- 查询报销(项目)类别 -->
+<div style="margin-top: 50px;">
+    <h1>查询报销(项目)类别</h1>
+    <!-- 添加搜索框 -->
+    <form class="layui-form layui-row layui-col-space16">
+        <div class="layui-col-md3">
+            <div class="layui-input-wrap">
+                <div class="layui-input-prefix">
+                    <i class="layui-icon layui-icon-search"></i>
+                </div>
+                <input type="text" name="category_name" value="" placeholder="输入需要查询报销(项目)类别" class="layui-input"
+                    lay-affix="clear">
+            </div>
+        </div>
+
+        <div class="layui-btn-container layui-col-xs12">
+            <button class="layui-btn" lay-submit lay-filter="searchCategory">搜索</button>
+            <button type="reset" class="layui-btn layui-btn-primary">清除</button>
+        </div>
+    </form>
+
+    <table class="layui-hide" id="categoryTable" lay-filter="categoryTable"></table>
+
+    <script>
+        layui.use(function () {
+            var table = layui.table;
+            var form = layui.form;
+            var laydate = layui.laydate;
+
+            // 初始化表格
+            table.render({
+                elem: '#categoryTable',
+                url: '/admin/category/api/search',
+                method: 'GET',
+                page: true,
+                cols: [[
+                    { field: 'category_id', title: 'ID', width: 80, sort: true },
+                    { field: 'category_name', title: '类别名称' },
+                ]],
+            });
+
+            // 搜索按钮
+            form.on('submit(searchCategory)', function (data) {
+                var field = data.field; // 获得表单字段
+                // 执行搜索重载
+                table.reload('categoryTable', {
+                    where: field, // 搜索的字段
+                    page: { curr: 1 } // 重置到第一页
+                });
+                return false; // 阻止默认 form 跳转
+            });
+        });
+    </script>
+</div>
+{% endblock %}

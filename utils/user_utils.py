@@ -25,7 +25,7 @@ async def user_select_all(access_token: str) -> dict:
         if access_token:
             username = await password_utils.get_user_from_jwt(access_token)
             if username:
-                user_dict = await operate.user_select_all(username)
+                user_dict = await operate.user_select_one_all(username)
                 {
                     "user_id": "1",
                     "username": "admin",

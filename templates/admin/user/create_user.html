@@ -3,73 +3,71 @@
 {% block title %}管理员 - 创建用户{% endblock %}
 
 {% block content %}
-<div class="center-container" style="padding: 20px;">
-    <h1>创建用户</h1>
-    <form class="layui-form" action="/admin/user/api/create_account" method="post" style="padding: 20px;">
+<h1>创建财务人员、报销人员账户</h1>
 
-        <!-- 用户名 -->
-        <div class="layui-form-item">
-            <div class="layui-input-wrap">
-                <div class="layui-input-prefix"> <i class="layui-icon layui-icon-username"></i> </div> <input
-                    type="text" name="username" lay-verify="required" placeholder="用户名" lay-reqtext="请填写用户名"
-                    autocomplete="off" class="layui-input" lay-affix="clear">
-            </div>
+<form class="layui-form" action="/admin/user/api/create_account" method="post" style="padding: 20px;">
+    <!-- 用户名 -->
+    <div class="layui-form-item">
+        <div class="layui-input-wrap">
+            <div class="layui-input-prefix"> <i class="layui-icon layui-icon-username"></i> </div> <input type="text"
+                name="username" lay-verify="required" placeholder="用户名" lay-reqtext="请填写用户名" autocomplete="off"
+                class="layui-input" lay-affix="clear">
         </div>
+    </div>
 
-        <!-- 密码 -->
-        <div class="layui-form-item">
-            <div class="layui-input-wrap">
-                <div class="layui-input-prefix">
-                    <i class="layui-icon layui-icon-password"></i>
-                </div>
-                <input type="password" name="password" lay-verify="required" placeholder="密码" lay-reqtext="请填写密码"
-                    autocomplete="off" class="layui-input" lay-affix="eye">
+    <!-- 密码 -->
+    <div class="layui-form-item">
+        <div class="layui-input-wrap">
+            <div class="layui-input-prefix">
+                <i class="layui-icon layui-icon-password"></i>
             </div>
+            <input type="password" name="password" lay-verify="required" placeholder="密码" lay-reqtext="请填写密码"
+                autocomplete="off" class="layui-input" lay-affix="eye">
         </div>
+    </div>
 
-        <!-- 确认密码 -->
-        <div class="layui-form-item">
-            <div class="layui-input-wrap">
-                <div class="layui-input-prefix">
-                    <i class="layui-icon layui-icon-password"></i>
-                </div>
-                <input type="password" name="confirm_password" required lay-verify="required|confirmPass"
-                    placeholder="请再次输入密码" autocomplete="off" class="layui-input" lay-affix="eye">
+    <!-- 确认密码 -->
+    <div class="layui-form-item">
+        <div class="layui-input-wrap">
+            <div class="layui-input-prefix">
+                <i class="layui-icon layui-icon-password"></i>
             </div>
+            <input type="password" name="confirm_password" required lay-verify="required|confirmPass"
+                placeholder="请再次输入密码" autocomplete="off" class="layui-input" lay-affix="eye">
         </div>
+    </div>
 
-        <!-- 真实姓名 -->
-        <div class="layui-form-item">
-            <div class="layui-input-wrap">
-                <div class="layui-input-prefix">
-                    <i class="layui-icon layui-icon-face-smile"></i>
-                </div>
-                <input type="text" name="real_name" lay-verify="required" placeholder="真实姓名" lay-reqtext="请填写真实姓名"
-                    autocomplete="off" class="layui-input" lay-affix="clear">
+    <!-- 真实姓名 -->
+    <div class="layui-form-item">
+        <div class="layui-input-wrap">
+            <div class="layui-input-prefix">
+                <i class="layui-icon layui-icon-face-smile"></i>
             </div>
+            <input type="text" name="real_name" lay-verify="required" placeholder="真实姓名" lay-reqtext="请填写真实姓名"
+                autocomplete="off" class="layui-input" lay-affix="clear">
         </div>
-        <!-- 角色选择 -->
-        <div class="layui-form-item">
-            <div class="layui-input-wrap">
-                <div class="layui-input-prefix">
-                    <i class="layui-icon layui-icon-form"></i>
-                </div>
-                <select name="role_name" lay-verify="required">
-                    <option value="">请选择角色</option>
-                    <option value="财务人员">财务人员</option>
-                    <option value="报销人员">报销人员</option>
-                </select>
+    </div>
+    <!-- 角色选择 -->
+    <div class="layui-form-item">
+        <div class="layui-input-wrap">
+            <div class="layui-input-prefix">
+                <i class="layui-icon layui-icon-form"></i>
             </div>
+            <select name="role_name" lay-verify="required">
+                <option value="">请选择角色</option>
+                <option value="财务人员">财务人员</option>
+                <option value="报销人员">报销人员</option>
+            </select>
         </div>
+    </div>
 
-        <div class="layui-form-item">
-            <div class="layui-input-block">
-                <button class="layui-btn" lay-submit lay-filter="createAccount">立即提交</button>
-                <button type="reset" class="layui-btn layui-btn-primary">重置</button>
-            </div>
+    <div class="layui-form-item">
+        <div class="layui-input-block" style="text-align: center;">
+            <button class="layui-btn" lay-submit lay-filter="createAccount">立即提交</button>
+            <button type="reset" class="layui-btn layui-btn-primary">重置</button>
         </div>
-    </form>
-</div>
+    </div>
+</form>
 
 <script>
     layui.use(function () {

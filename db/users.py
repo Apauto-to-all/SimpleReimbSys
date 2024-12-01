@@ -15,7 +15,7 @@ logger = logging.getLogger(__name__)
 class UserTable:
 
     # 查询用户表的所有数据，包含角色名称
-    async def user_select_all(self, username: str) -> dict:
+    async def user_select_one_all(self, username: str) -> dict:
         async with self.pool.acquire() as conn:
             try:
                 sql = """

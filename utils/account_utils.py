@@ -47,7 +47,7 @@ async def check_username_exist(username: str) -> bool:
     :return: 用户名存在返回True，用户名不存在返回False
     """
     try:
-        if await operate.user_select_all(username):
+        if await operate.user_select_one_all(username):
             return True
     except Exception as e:
         logger.error(e)

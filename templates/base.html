@@ -74,16 +74,18 @@
         </div>
         <!-- 内容主体区域 -->
         <div class="layui-body">
-            {% block content %}
-            <!-- 子模板的内容将插入这里 -->
-            {% endblock %}
+            <div class="body-container">
+                {% block content %}
+                <!-- 子模板的内容将插入这里 -->
+                {% endblock %}
+            </div>
         </div>
         <!-- 底部 -->
         <div class="layui-footer">
             © 简易财务报销系统
         </div>
     </div>
-    <!-- 引入 JavaScript 文件 -->
+
     <script>
         layui.use('element', function () {
             var element = layui.element;

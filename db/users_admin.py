@@ -63,6 +63,7 @@ class UsersAdminOperation:
                 data = await conn.fetch(
                     sql, username, real_name, role_name, limit, page
                 )
+                data = [dict(record) for record in data]
                 return count, data
             except Exception as e:
                 error_info = traceback.format_exc()

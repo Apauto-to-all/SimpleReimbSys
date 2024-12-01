@@ -19,7 +19,7 @@ async def verify_login(username: str, password: str) -> bool:
     :return: 登入成功返回True，登入失败返回False
     """
     try:
-        user_dict = await operate.user_select_all(username)
+        user_dict = await operate.user_select_one_all(username)
         if user_dict:
             if await password_utils.verify_password(
                 user_dict.get("password"), password
