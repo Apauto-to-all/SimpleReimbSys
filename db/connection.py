@@ -24,10 +24,16 @@ logger = logging.getLogger(__name__)
 from .users import UserTable
 from .users_admin import UsersAdminOperation
 from .category_admin import CategoryAdminOperation
+from .project_admin import ProjectAdminOperation
 
 
 # 数据库操作类
-class DatabaseOperation(UserTable, UsersAdminOperation, CategoryAdminOperation):
+class DatabaseOperation(
+    UserTable,
+    UsersAdminOperation,
+    CategoryAdminOperation,
+    ProjectAdminOperation,
+):
     _instance = None  # 单例模式
     error_mun = 0  # 错误次数
 
