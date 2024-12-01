@@ -21,7 +21,7 @@ class CategoryAdminOperation:
                 FROM categories
                 WHERE category_name = $1
                 """
-                result = await conn.fetch(sql, category_name)
+                result = await conn.fetchrow(sql, category_name)
                 return result
             except Exception as e:
                 error_info = traceback.format_exc()
@@ -93,3 +93,21 @@ class CategoryAdminOperation:
                 logger.error(error_info)
                 logger.error(e)
                 return False
+
+    # 获取所有报销(项目)类别
+    async def category_search_all(self):
+        async with self.pool.acquire() as conn:
+            try:
+                sql = """
+                SELECT category_id, category_name
+                FROM categories
+                ORDER BY category_id
+                """
+                result = await conn.fetch(sql)
+                result = [dict(record) for record in result]
+                return result
+            except Exception as e:
+                error_info = traceback.format_exc()
+                logger.error(error_info)
+                logger.error(e)
+                return []

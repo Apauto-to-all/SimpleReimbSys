@@ -55,11 +55,27 @@ async def admin_category_search(
     user_dict = await user_utils.user_select_all(access_token)
     if user_dict.get("role_name") != "管理员":
         return RedirectResponse("/login", status_code=302)
-    print(page, limit, type(page), type(limit), type(category_name))
+
     count, list_data = await category_utils.search_category_info(
         page, limit, category_name
     )
     return JSONResponse(
         content={"code": 0, "msg": "", "count": count, "data": list_data},
+        status_code=200,
+    )
+
+
+# 获取所有报销(项目)类别api
+@router.get("/admin/category/api/search_all", response_class=JSONResponse)
+async def admin_category_search_all(
+    access_token: Optional[str] = Cookie(None),
+):
+    user_dict = await user_utils.user_select_all(access_token)
+    if user_dict.get("role_name") != "管理员":
+        return RedirectResponse("/login", status_code=302)
+
+    list_data = await category_utils.search_all_category()
+    return JSONResponse(
+        content={"data": list_data},
         status_code=200,
     )

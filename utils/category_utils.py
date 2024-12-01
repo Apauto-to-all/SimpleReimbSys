@@ -64,3 +64,18 @@ async def search_category_info(page: int, limit: int, category_name: str) -> tup
         logger.error(e)
         logger.error(traceback.format_exc())
     return count, list_data
+
+
+# 获取所有报销(项目)类别
+async def search_all_category() -> list:
+    """
+    获取所有报销(项目)类别
+    :return: 返回所有报销(项目)类别列表
+    """
+    list_data = []
+    try:
+        list_data = await operate.category_search_all()
+    except Exception as e:
+        logger.error(e)
+        logger.error(traceback.format_exc())
+    return list_data

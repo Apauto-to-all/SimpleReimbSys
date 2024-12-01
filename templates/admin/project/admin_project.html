@@ -7,11 +7,121 @@
 <div>
     <h1>创建报销项目</h1>
 
+    <form class="layui-form layui-form-pane" action="/admin/project/api/create" method="post" style="padding: 20px;">
+        <div class="layui-row layui-col-space15">
+            <!-- 项目名称 -->
+            <div class="layui-col-md6">
+                <div class="layui-form-item">
+                    <label class="layui-form-label">项目名称</label>
+                    <div class="layui-input-block">
+                        <input type="text" name="project_name" autocomplete="off" placeholder="请输入项目名称"
+                            lay-verify="required" class="layui-input">
+                    </div>
+                </div>
+            </div>
+
+            <!-- 所属类别 -->
+            <div class="layui-col-md6">
+                <div class="layui-form-item">
+                    <label class="layui-form-label">所属类别</label>
+                    <div class="layui-input-block">
+                        <select name="category_name" lay-verify="required" lay-search>
+                            <option value="">请选择所属类别</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 项目来源 -->
+        <div class="layui-form-item layui-form-text">
+            <label class="layui-form-label">项目来源</label>
+
+            <div class="layui-input-block">
+                <textarea placeholder="请输入项目来源" class="layui-textarea" name="project_source"
+                    lay-verify="required"></textarea>
+            </div>
+        </div>
+
+        <!-- 立项金额 -->
+        <div class="layui-form-item">
+            <label class="layui-form-label">立项金额</label>
+            <div class="layui-input-block">
+                <input type="number" name="total_amount" autocomplete="off" placeholder="请输入立项金额 ￥"
+                    lay-verify="required|number" class="layui-input">
+            </div>
+        </div>
+
+        <!-- 提交按钮 -->
+        <div class="layui-form-item">
+            <button class="layui-btn" lay-submit lay-filter="createProject">创建</button>
+            <button type="reset" class="layui-btn layui-btn-primary">重置</button>
+        </div>
+    </form>
+
+    <script>
+        layui.use(function () {
+            var layer = layui.layer;
+            var form = layui.form;
+
+            // 页面加载时获取类别数据
+            fetch('/admin/category/api/search_all')
+                .then(response => response.json())
+                .then(res => {
+                    if (res.data) {
+                        const select = document.querySelector('select[name="category_name"]');
+                        res.data.forEach(category => {
+                            const option = document.createElement('option');
+                            option.value = category.category_name;
+                            option.textContent = category.category_name;
+                            select.appendChild(option);
+                        });
+                        form.render('select'); // 刷新选择框渲染
+                    }
+                })
+                .catch(err => {
+                    console.error(err);
+                    layer.alert('无法获取类别数据，请稍后再试。', { icon: 5 });
+                });
+
+            // 监听提交
+            form.on('submit(createProject)', function (data) {
+                // 加载动画
+                var loading = layer.load(2);
+                fetch('/admin/project/api/create', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded'
+                    },
+                    body: new URLSearchParams(data.field)
+                })
+                    .then(response => {
+                        layer.close(loading);
+                        if (response.status == 200) {
+                            return response.json().then(res => {
+                                layer.msg(res.message, { icon: 1 });
+                            });
+                        } else {
+                            return response.json().then(res => {
+                                layer.alert(res.message, { icon: 2 });
+                            });
+                        }
+                    }).catch(err => {
+                        layer.close(loading);
+                        console.error(err);
+                        layer.alert('请求失败，请稍后再试。', {
+                            icon: 5
+                        });
+                    });
+                return false; // 阻止表单默认提交
+            });
+        });
+    </script>
 </div>
 
 <!-- 搜索报销项目 -->
 <div>
-
+    <h1>查询报销项目</h1>
 </div>
 
 {% endblock %}
