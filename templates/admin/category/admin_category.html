@@ -93,7 +93,7 @@
         layui.use(function () {
             var table = layui.table;
             var form = layui.form;
-            var laydate = layui.laydate;
+            var layer = layui.layer;
 
             // 初始化表格
             table.render({
@@ -101,10 +101,14 @@
                 url: '/admin/category/api/search',
                 method: 'GET',
                 page: true,
+                limits: [10, 20, 30, 50],
+                limit: 10,
                 cols: [[
                     { field: 'category_id', title: 'ID', width: 80, sort: true },
                     { field: 'category_name', title: '类别名称' },
                 ]],
+                toolbar: '#toolbarDemo', // 添加工具条
+                title: '报销(项目)类别表',
             });
 
             // 搜索按钮
