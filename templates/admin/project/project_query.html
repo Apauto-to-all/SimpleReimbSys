@@ -36,7 +36,9 @@
             <div class="layui-input-prefix">
                 <i class="layui-icon layui-icon-search"></i>
             </div>
-            <input type="text" name="category_name" value="" placeholder="输入所属类别" class="layui-input" lay-affix="clear">
+            <select name="category_name" lay-search>
+                <option value="">请选择所属类别</option>
+            </select>
         </div>
     </div>
 
@@ -50,11 +52,11 @@
 <!-- 项目表格 -->
 <table class="layui-hide" id="projectTable" lay-filter="projectTable"></table>
 
-<!-- 表格模板（可选，如需操作列等） -->
+<!-- 工具栏 -->
 <script type="text/html" id="actions">
-        <a class="layui-btn layui-btn-xs" lay-event="view">查看</a>
-        <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="delete">删除</a>
-    </script>
+    <a class="layui-btn layui-btn-xs" lay-event="view">查看</a>
+    <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="delete">删除</a>
+</script>
 
 <!-- 搜索报销项目脚本 -->
 <script>
@@ -62,6 +64,26 @@
         var table = layui.table;
         var form = layui.form;
         var layer = layui.layer;
+
+        // 页面加载时获取类别数据
+        fetch('/admin/category/api/search_all')
+            .then(response => response.json())
+            .then(res => {
+                if (res.data) {
+                    const select = document.querySelector('select[name="category_name"]');
+                    res.data.forEach(category => {
+                        const option = document.createElement('option');
+                        option.value = category.category_name;
+                        option.textContent = category.category_name;
+                        select.appendChild(option);
+                    });
+                    form.render('select'); // 刷新选择框渲染
+                }
+            })
+            .catch(err => {
+                console.error(err);
+                layer.alert('无法获取类别数据，请稍后再试。', { icon: 5 });
+            });
 
         // 初始化表格
         var projectTable = table.render({
