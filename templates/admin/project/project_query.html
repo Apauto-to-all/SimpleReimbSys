@@ -1,0 +1,156 @@
+{% extends 'base.html' %}
+
+{% block title %}管理员 - 创建报销(项目)类别{% endblock %}
+
+{% block content %}
+
+<!-- 搜索报销项目 -->
+<h1>查询报销项目</h1>
+
+<!-- 添加搜索框 -->
+<form class="layui-form layui-row layui-col-space16" lay-filter="searchProjectForm">
+    <!-- 项目名称 -->
+    <div class="layui-col-md4">
+        <div class="layui-input-wrap">
+            <div class="layui-input-prefix">
+                <i class="layui-icon layui-icon-search"></i>
+            </div>
+            <input type="text" name="project_name" value="" placeholder="输入项目名称" class="layui-input" lay-affix="clear">
+        </div>
+    </div>
+
+    <!-- 项目来源 -->
+    <div class="layui-col-md4">
+        <div class="layui-input-wrap">
+            <div class="layui-input-prefix">
+                <i class="layui-icon layui-icon-search"></i>
+            </div>
+            <input type="text" name="project_source" value="" placeholder="输入项目来源" class="layui-input"
+                lay-affix="clear">
+        </div>
+    </div>
+
+    <!-- 所属类别 -->
+    <div class="layui-col-md4">
+        <div class="layui-input-wrap">
+            <div class="layui-input-prefix">
+                <i class="layui-icon layui-icon-search"></i>
+            </div>
+            <input type="text" name="category_name" value="" placeholder="输入所属类别" class="layui-input" lay-affix="clear">
+        </div>
+    </div>
+
+    <!-- 搜索和重置按钮 -->
+    <div class="layui-col-md12 layui-btn-container">
+        <button class="layui-btn" lay-submit lay-filter="searchProject">搜索</button>
+        <button type="reset" class="layui-btn layui-btn-primary">清除</button>
+    </div>
+</form>
+
+<!-- 项目表格 -->
+<table class="layui-hide" id="projectTable" lay-filter="projectTable"></table>
+
+<!-- 表格模板（可选，如需操作列等） -->
+<script type="text/html" id="actions">
+        <a class="layui-btn layui-btn-xs" lay-event="view">查看</a>
+        <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="delete">删除</a>
+    </script>
+
+<!-- 搜索报销项目脚本 -->
+<script>
+    layui.use(function () {
+        var table = layui.table;
+        var form = layui.form;
+        var layer = layui.layer;
+
+        // 初始化表格
+        var projectTable = table.render({
+            elem: '#projectTable',
+            url: '/admin/project/api/search',
+            method: 'GET',
+            page: true,
+            limits: [10, 20, 30, 50],
+            limit: 10,
+            cols: [[
+                { field: 'project_id', title: 'ID', width: 80, sort: true },
+                { field: 'project_name', title: '项目名称', minWidth: 150 },
+                { field: 'project_source', title: '项目来源', minWidth: 150 },
+                { field: 'category_name', title: '所属类别', minWidth: 120 },
+                { field: 'total_amount', title: '立项金额 (￥)', minWidth: 120, sort: true },
+                { field: 'balance', title: '余额 (￥)', minWidth: 100, sort: true },
+                { fixed: 'right', title: '操作', toolbar: '#actions', width: 150 }
+            ]],
+            toolbar: '#toolbarDemo', // 可选，添加工具条
+            title: '报销项目表'
+        });
+
+        // 监听搜索表单提交
+        form.on('submit(searchProject)', function (data) {
+            var field = data.field; // 获取表单字段
+            // 重新加载表格，传递搜索参数
+            projectTable.reload({
+                where: {
+                    project_name: field.project_name,
+                    project_source: field.project_source,
+                    category_name: field.category_name
+                },
+                page: {
+                    curr: 1 // 重新从第 1 页开始
+                }
+            });
+            return false; // 阻止表单默认提交
+        });
+
+        // 监听表格中的工具事件
+        table.on('tool(projectTable)', function (obj) {
+            var data = obj.data; // 当前行数据
+            var event = obj.event; // 事件类型
+
+            if (event === 'view') {
+                // 查看项目详情
+                layer.open({
+                    type: 1,
+                    title: '项目详情',
+                    content: `
+                            <div style="padding: 20px;">
+                                <p><strong>项目ID:</strong> ${data.project_id}</p>
+                                <p><strong>项目名称:</strong> ${data.project_name}</p>
+                                <p><strong>项目来源:</strong> ${data.project_source}</p>
+                                <p><strong>所属类别:</strong> ${data.category_name}</p>
+                                <p><strong>立项金额:</strong> ￥${data.total_amount.toLocaleString()}</p>
+                                <p><strong>余额:</strong> ￥${data.balance.toLocaleString()}</p>
+                            </div>
+                        `,
+                    area: ['400px', '300px']
+                });
+            } else if (event === 'delete') {
+                // 删除项目
+                layer.confirm('确定删除该项目吗？', function (index) {
+                    // 发送删除请求到后端
+                    fetch(`/admin/project/api/delete/${data.project_id}`, {
+                        method: 'DELETE',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        }
+                    })
+                        .then(response => response.json())
+                        .then(res => {
+                            if (res.status === 'success') {
+                                layer.msg('删除成功', { icon: 1 });
+                                projectTable.reload();
+                            } else {
+                                layer.alert('删除失败: ' + res.message, { icon: 2 });
+                            }
+                        })
+                        .catch(err => {
+                            console.error(err);
+                            layer.alert('请求失败，请稍后再试。', { icon: 5 });
+                        });
+                    layer.close(index);
+                });
+            }
+        });
+        // 可选：添加工具条事件（如批量删除等）
+    });
+</script>
+{% endblock %}

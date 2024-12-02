@@ -62,3 +62,29 @@ async def create_project(
         logger.error(traceback.format_exc())
 
     return False
+
+
+# 搜索项目
+async def search_project_info(
+    page: int, limit: int, project_name: str, category_name: str, project_source: str
+) -> tuple:
+    """
+    搜索项目，模糊查询
+    :param page: 页码
+    :param limit: 每页数量
+    :param project_name: 项目名称
+    :param category_name: 类别名称
+    :param project_source: 项目来源
+    :return: 项目数量，项目列表
+    """
+    count = 0
+    list_data = []
+    try:
+        count, list_data = await operate.project_search(
+            page, limit, project_name, category_name, project_source
+        )
+    except Exception as e:
+        logger.error(e)
+        logger.error(traceback.format_exc())
+
+    return count, list_data

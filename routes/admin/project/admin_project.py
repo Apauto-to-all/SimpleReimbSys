@@ -20,8 +20,8 @@ router = APIRouter()
 templates = Jinja2Templates(directory="templates")
 
 
-# 报销项目管理
-@router.get("/admin/project", response_class=HTMLResponse)
+# 报销项目创建页面
+@router.get("/admin/project/create", response_class=HTMLResponse)
 async def admin_project(
     request: Request,
     access_token: Optional[str] = Cookie(None),
@@ -29,7 +29,22 @@ async def admin_project(
     user_dict = await user_utils.user_select_all(access_token)
     if user_dict.get("role_name") == "管理员":
         return templates.TemplateResponse(
-            "admin/project/admin_project.html",
+            "admin/project/project_create.html",
+            {"request": request, "user_dict": user_dict},
+        )
+    return RedirectResponse("/index", status_code=302)
+
+
+# 报销项目查询页面
+@router.get("/admin/project/query", response_class=HTMLResponse)
+async def admin_project_query(
+    request: Request,
+    access_token: Optional[str] = Cookie(None),
+):
+    user_dict = await user_utils.user_select_all(access_token)
+    if user_dict.get("role_name") == "管理员":
+        return templates.TemplateResponse(
+            "admin/project/project_query.html",
             {"request": request, "user_dict": user_dict},
         )
     return RedirectResponse("/index", status_code=302)

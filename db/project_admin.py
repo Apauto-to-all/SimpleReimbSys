@@ -55,3 +55,56 @@ class ProjectAdminOperation:
                 logger.error(traceback.format_exc())
                 logger.error(e)
                 return False
+
+    # 搜索项目信息
+    async def project_search(
+        self,
+        page: int,
+        limit: int,
+        project_name: str,
+        category_name: str,
+        project_source: str,
+    ):
+        async with self.pool.acquire() as conn:
+            try:
+                # 计数查询，加入 categories 表以支持 category_name 的模糊搜索
+                count_sql = """
+                SELECT COUNT(*)
+                FROM projects p
+                JOIN categories c ON p.category_id = c.category_id
+                WHERE p.project_name ILIKE '%' || $1 || '%' 
+                AND p.project_source ILIKE '%' || $2 || '%' 
+                AND c.category_name ILIKE '%' || $3 || '%'
+                """
+                count = await conn.fetchval(
+                    count_sql, project_name, project_source, category_name
+                )
+                if not count:
+                    return 0, []
+
+                # 数据查询，加入 categories 表以支持 category_name 的模糊搜索
+                sql = """
+                SELECT p.project_id, p.project_name, p.project_source, p.category_id, c.category_name, p.total_amount, p.balance
+                FROM projects p
+                JOIN categories c ON p.category_id = c.category_id
+                WHERE p.project_name ILIKE '%' || $1 || '%' 
+                AND p.project_source ILIKE '%' || $2 || '%' 
+                AND c.category_name ILIKE '%' || $3 || '%'
+                ORDER BY p.project_id
+                LIMIT $4
+                OFFSET $5
+                """
+                result = await conn.fetch(
+                    sql,
+                    project_name,
+                    project_source,
+                    category_name,
+                    limit,
+                    (page - 1) * limit,
+                )
+                result = [dict(record) for record in result]
+                return count, result
+            except Exception as e:
+                logger.error(traceback.format_exc())
+                logger.error(e)
+                return 0, []

@@ -1,3 +1,4 @@
+from itertools import count
 from fastapi import (
     APIRouter,  # 功能：用于创建路由
     Request,  # 功能：用于接收请求
@@ -56,3 +57,26 @@ async def create_project(
         return JSONResponse(content={"message": "创建成功"}, status_code=200)
 
     return JSONResponse(content={"message": "创建失败"}, status_code=400)
+
+
+# 查询项目
+@router.get("/admin/project/api/search")
+async def search_project(
+    page: int = Query(1),  # 页码
+    limit: int = Query(10),  # 每页数量
+    project_name: Optional[str] = Query(""),  # 项目名称
+    category_name: Optional[str] = Query(""),  # 所属类别
+    project_source: Optional[str] = Query(""),  # 项目来源
+    access_token: Optional[str] = Cookie(None),
+):
+    user_dict = await user_utils.user_select_all(access_token)
+    if user_dict.get("role_name") != "管理员":
+        return JSONResponse(content={"message": "无权限"}, status_code=403)
+
+    count, list_data = await project_utils.search_project_info(
+        page, limit, project_name, category_name, project_source
+    )
+    return JSONResponse(
+        content={"code": 0, "msg": "", "count": count, "data": list_data},
+        status_code=200,
+    )

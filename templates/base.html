@@ -51,7 +51,13 @@
                         <a href="/admin/category"><i class="layui-icon layui-icon-set"></i> 报销类别管理</a>
                     </li>
                     <li class="layui-nav-item">
-                        <a href="/admin/project"><i class="layui-icon layui-icon-app"></i> 项目管理</a>
+                        <a href="javascript:;">
+                            <i class="layui-icon layui-icon-app"></i> 项目管理
+                        </a>
+                        <dl class="layui-nav-child">
+                            <dd><a href="/admin/project/create">创建项目</a></dd>
+                            <dd><a href="/admin/project/query">查询项目</a></dd>
+                        </dl>
                     </li>
                     {% elif user_dict.role_name == "报销人员" %}
                     <li class="layui-nav-item">
