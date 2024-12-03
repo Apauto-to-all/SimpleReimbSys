@@ -8,7 +8,7 @@
 <h1>查询用户</h1>
 
 <!-- 添加搜索框 -->
-<form class="layui-form layui-row layui-col-space16" lay-filter="searchUserForm">
+<form class="layui-form layui-row layui-col-space16">
     <!-- 用户名 -->
     <div class="layui-col-md4">
         <div class="layui-input-wrap">
@@ -44,7 +44,7 @@
     <!-- 搜索和清除按钮 -->
     <div class="layui-col-md12 layui-btn-container">
         <button class="layui-btn" lay-submit lay-filter="searchUser">搜索</button>
-        <button type="button" class="layui-btn layui-btn-primary" id="resetBtn">清除</button>
+        <button type="reset" class="layui-btn layui-btn-primary" id="resetBtn">清除</button>
     </div>
 </form>
 
@@ -87,7 +87,7 @@
         // 初始化表格
         var userTable = table.render({
             elem: '#userTable',
-            url: '/admin/user/search',
+            url: '/admin/user/api/search',
             method: 'GET',
             page: true,
             limits: [10, 20, 30, 50],

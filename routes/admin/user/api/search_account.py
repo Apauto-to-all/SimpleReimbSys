@@ -25,7 +25,7 @@ templates = Jinja2Templates(directory="templates")
 
 
 # 搜索账户，可以根据用户名、真实姓名、角色进行模糊搜索
-@router.get("/admin/user/search")
+@router.get("/admin/user/api/search")
 async def search_account(
     page: int = Query(1),
     limit: int = Query(10),
