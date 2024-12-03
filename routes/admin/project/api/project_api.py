@@ -67,6 +67,7 @@ async def search_project(
     project_name: Optional[str] = Query(""),  # 项目名称
     category_name: Optional[str] = Query(""),  # 所属类别
     project_source: Optional[str] = Query(""),  # 项目来源
+    assign: Optional[int] = Query(-1),  # 是否分配，0：未分配，1：已分配，-1：不限
     access_token: Optional[str] = Cookie(None),
 ):
     user_dict = await user_utils.user_select_all(access_token)
@@ -74,7 +75,7 @@ async def search_project(
         return JSONResponse(content={"message": "无权限"}, status_code=403)
 
     count, list_data = await project_utils.search_project_info(
-        page, limit, project_name, category_name, project_source
+        page, limit, project_name, category_name, project_source, assign
     )
     return JSONResponse(
         content={"code": 0, "msg": "", "count": count, "data": list_data},

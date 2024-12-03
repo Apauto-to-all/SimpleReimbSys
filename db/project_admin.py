@@ -64,17 +64,33 @@ class ProjectAdminOperation:
         project_name: str,
         category_name: str,
         project_source: str,
+        assign: int,
     ):
         async with self.pool.acquire() as conn:
             try:
-                # 计数查询，加入 categories 表以支持 category_name 的模糊搜索
-                count_sql = """
+                # 构建条件
+                assign_condition = ""
+                if assign == 0:
+                    # 未分配，项目没有任何分配记录
+                    assign_condition = "HAVING COUNT(pm.employee_id) = 0"
+                elif assign == 1:
+                    # 已分配，项目至少有一个分配记录
+                    assign_condition = "HAVING COUNT(pm.employee_id) > 0"
+
+                # 计数查询，加入 projects_manager 表以支持 assign 条件
+                count_sql = f"""
                 SELECT COUNT(*)
-                FROM projects p
-                JOIN categories c ON p.category_id = c.category_id
-                WHERE p.project_name ILIKE '%' || $1 || '%' 
-                AND p.project_source ILIKE '%' || $2 || '%' 
-                AND c.category_name ILIKE '%' || $3 || '%'
+                FROM (
+                    SELECT p.project_id
+                    FROM projects p
+                    JOIN categories c ON p.category_id = c.category_id
+                    LEFT JOIN projects_manager pm ON p.project_id = pm.project_id
+                    WHERE p.project_name ILIKE '%' || $1 || '%'
+                    AND p.project_source ILIKE '%' || $2 || '%'
+                    AND c.category_name ILIKE '%' || $3 || '%'
+                    GROUP BY p.project_id
+                    {assign_condition}
+                ) sub
                 """
                 count = await conn.fetchval(
                     count_sql, project_name, project_source, category_name
@@ -82,14 +98,25 @@ class ProjectAdminOperation:
                 if not count:
                     return 0, []
 
-                # 数据查询，加入 categories 表以支持 category_name 的模糊搜索
-                sql = """
-                SELECT p.project_id, p.project_name, p.project_source, p.category_id, c.category_name, p.total_amount, p.balance
+                # 数据查询，获取项目信息和已分配的员工ID列表
+                sql = f"""
+                SELECT
+                    p.project_id,
+                    p.project_name,
+                    p.project_source,
+                    p.category_id,
+                    c.category_name,
+                    p.total_amount,
+                    p.balance,
+                    COALESCE(array_agg(pm.employee_id) FILTER (WHERE pm.employee_id IS NOT NULL), '{{}}') AS employee_id_list
                 FROM projects p
                 JOIN categories c ON p.category_id = c.category_id
-                WHERE p.project_name ILIKE '%' || $1 || '%' 
-                AND p.project_source ILIKE '%' || $2 || '%' 
+                LEFT JOIN projects_manager pm ON p.project_id = pm.project_id
+                WHERE p.project_name ILIKE '%' || $1 || '%'
+                AND p.project_source ILIKE '%' || $2 || '%'
                 AND c.category_name ILIKE '%' || $3 || '%'
+                GROUP BY p.project_id, c.category_name, p.category_id, p.project_name, p.project_source, p.total_amount, p.balance
+                {assign_condition}
                 ORDER BY p.project_id
                 LIMIT $4
                 OFFSET $5

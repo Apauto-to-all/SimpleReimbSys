@@ -50,6 +50,7 @@ async def admin_category_search(
     page: int = Query(1),
     limit: int = Query(10),
     category_name: Optional[str] = Query(""),  # 类别名称
+    assign: Optional[int] = Query(-1),  # 是否分配，0：未分配，1：已分配，-1：不限
     access_token: Optional[str] = Cookie(None),
 ):
     user_dict = await user_utils.user_select_all(access_token)
@@ -57,7 +58,7 @@ async def admin_category_search(
         return RedirectResponse("/login", status_code=302)
 
     count, list_data = await category_utils.search_category_info(
-        page, limit, category_name
+        page, limit, category_name, assign
     )
     return JSONResponse(
         content={"code": 0, "msg": "", "count": count, "data": list_data},
