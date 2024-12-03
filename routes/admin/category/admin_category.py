@@ -21,15 +21,30 @@ templates = Jinja2Templates(directory="templates")
 
 
 # 报销(项目)类别管理
-@router.get("/admin/category", response_class=HTMLResponse)
-async def admin_category(
+@router.get("/admin/category/create", response_class=HTMLResponse)
+async def admin_category_create(
     request: Request,
     access_token: Optional[str] = Cookie(None),
 ):
     user_dict = await user_utils.user_select_all(access_token)
     if user_dict.get("role_name") == "管理员":
         return templates.TemplateResponse(
-            "admin/category/admin_category.html",
+            "admin/category/category_create.html",
+            {"request": request, "user_dict": user_dict},
+        )
+    return RedirectResponse("/index", status_code=302)
+
+
+# 报销(项目)类别分配
+@router.get("/admin/category/assign", response_class=HTMLResponse)
+async def admin_category_assign(
+    request: Request,
+    access_token: Optional[str] = Cookie(None),
+):
+    user_dict = await user_utils.user_select_all(access_token)
+    if user_dict.get("role_name") == "管理员":
+        return templates.TemplateResponse(
+            "admin/category/category_assign.html",
             {"request": request, "user_dict": user_dict},
         )
     return RedirectResponse("/index", status_code=302)

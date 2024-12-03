@@ -1,11 +1,11 @@
 {% extends 'base.html' %}
 
-{% block title %}管理员 - 搜索报销(项目)类别{% endblock %}
+{% block title %}管理员 - 分配报销(项目)类别{% endblock %}
 
 {% block content %}
 
-<!-- 搜索报销项目 -->
-<h1>查询报销项目</h1>
+<!-- 分配报销项目 -->
+<h1>分配报销项目</h1>
 
 <!-- 添加搜索框 -->
 <form class="layui-form layui-row layui-col-space16" lay-filter="searchProjectForm">
@@ -54,9 +54,9 @@
 
 <!-- 工具栏 -->
 <script type="text/html" id="actions">
-    <a class="layui-btn layui-btn-xs" lay-event="view">查看</a>
-    <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="delete">删除</a>
-</script>
+        <a class="layui-btn layui-btn-xs" lay-event="view">查看</a>
+        <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="delete">删除</a>
+    </script>
 
 <!-- 搜索报销项目脚本 -->
 <script>

@@ -35,16 +35,16 @@ async def admin_project(
     return RedirectResponse("/index", status_code=302)
 
 
-# 报销项目查询页面
-@router.get("/admin/project/query", response_class=HTMLResponse)
-async def admin_project_query(
+# 报销项目分配页面
+@router.get("/admin/project/assign", response_class=HTMLResponse)
+async def admin_project_assign(
     request: Request,
     access_token: Optional[str] = Cookie(None),
 ):
     user_dict = await user_utils.user_select_all(access_token)
     if user_dict.get("role_name") == "管理员":
         return templates.TemplateResponse(
-            "admin/project/project_query.html",
+            "admin/project/project_assign.html",
             {"request": request, "user_dict": user_dict},
         )
     return RedirectResponse("/index", status_code=302)

@@ -1,0 +1,78 @@
+{% extends 'base.html' %}
+
+{% block title %}管理员 - 分配报销(项目)类别{% endblock %}
+
+{% block content %}
+
+<!-- 分配报销(项目)类别 -->
+<h1>分配报销(项目)类别</h1>
+<!-- 添加搜索框 -->
+<form class="layui-form layui-row layui-col-space16">
+    <div class="layui-col-md4">
+        <div class="layui-input-wrap">
+            <div class="layui-input-prefix">
+                <i class="layui-icon layui-icon-search"></i>
+            </div>
+            <input type="text" name="category_name" value="" placeholder="输入需要查询报销(项目)类别，支持模糊搜索" class="layui-input"
+                lay-affix="clear">
+        </div>
+    </div>
+
+    <div class="layui-btn-container layui-col-xs12">
+        <button class="layui-btn" lay-submit lay-filter="searchCategory">搜索</button>
+        <button type="reset" class="layui-btn layui-btn-primary" id="resetBtn">清除</button>
+    </div>
+</form>
+
+<table class="layui-hide" id="categoryTable" lay-filter="categoryTable"></table>
+
+<script>
+    layui.use(function () {
+        var table = layui.table;
+        var form = layui.form;
+        var layer = layui.layer;
+
+        // 初始化表格
+        var categoryTable = table.render({
+            elem: '#categoryTable',
+            url: '/admin/category/api/search',
+            method: 'GET',
+            page: true,
+            limits: [10, 20, 30, 50],
+            limit: 10,
+            cols: [[
+                { field: 'category_id', title: 'ID', width: 80, sort: true },
+                { field: 'category_name', title: '类别名称' },
+            ]],
+            toolbar: '#toolbarDemo', // 添加工具条
+            title: '报销(项目)类别表',
+        });
+
+        // 搜索按钮
+        form.on('submit(searchCategory)', function (data) {
+            var field = data.field; // 获得表单字段
+            // 执行搜索重载
+            categoryTable.reload({
+                where: {
+                    category_name: field.category_name,
+                },
+                page: { curr: 1 } // 重置到第一页
+            });
+            return false; // 阻止默认 form 跳转
+        });
+
+        // 清除按钮点击事件
+        document.getElementById('resetBtn').addEventListener('click', function () {
+            // 重新加载表格，传递空的搜索参数
+            categoryTable.reload({
+                where: {
+                    category_name: '',
+                },
+                page: {
+                    curr: 1 // 重新从第1页开始
+                }
+            });
+        });
+    });
+</script>
+{% endblock %}
