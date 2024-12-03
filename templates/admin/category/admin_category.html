@@ -83,7 +83,7 @@
 
         <div class="layui-btn-container layui-col-xs12">
             <button class="layui-btn" lay-submit lay-filter="searchCategory">搜索</button>
-            <button type="reset" class="layui-btn layui-btn-primary">清除</button>
+            <button type="reset" class="layui-btn layui-btn-primary" id="resetBtn">清除</button>
         </div>
     </form>
 
@@ -96,7 +96,7 @@
             var layer = layui.layer;
 
             // 初始化表格
-            table.render({
+            var categoryTable = table.render({
                 elem: '#categoryTable',
                 url: '/admin/category/api/search',
                 method: 'GET',
@@ -115,11 +115,26 @@
             form.on('submit(searchCategory)', function (data) {
                 var field = data.field; // 获得表单字段
                 // 执行搜索重载
-                table.reload('categoryTable', {
-                    where: field, // 搜索的字段
+                categoryTable.reload({
+                    where: {
+                        category_name: field.category_name,
+                    },
                     page: { curr: 1 } // 重置到第一页
                 });
                 return false; // 阻止默认 form 跳转
+            });
+
+            // 清除按钮点击事件
+            document.getElementById('resetBtn').addEventListener('click', function () {
+                // 重新加载表格，传递空的搜索参数
+                categoryTable.reload({
+                    where: {
+                        category_name: '',
+                    },
+                    page: {
+                        curr: 1 // 重新从第1页开始
+                    }
+                });
             });
         });
     </script>

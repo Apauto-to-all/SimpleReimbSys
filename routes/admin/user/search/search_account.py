@@ -37,6 +37,7 @@ async def search_account(
     user_dict = await user_utils.user_select_all(access_token)
     if not user_dict.get("role_name") == "管理员":
         return RedirectResponse("/login", status_code=302)
+
     count, list_data = await account_utils.saerch_user_info(
         page, limit, username, real_name, role_name
     )

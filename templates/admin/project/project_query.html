@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 
-{% block title %}管理员 - 创建报销(项目)类别{% endblock %}
+{% block title %}管理员 - 搜索报销(项目)类别{% endblock %}
 
 {% block content %}
 
@@ -45,7 +45,7 @@
     <!-- 搜索和重置按钮 -->
     <div class="layui-col-md12 layui-btn-container">
         <button class="layui-btn" lay-submit lay-filter="searchProject">搜索</button>
-        <button type="reset" class="layui-btn layui-btn-primary">清除</button>
+        <button type="reset" class="layui-btn layui-btn-primary" id="resetBtn">清除</button>
     </div>
 </form>
 
@@ -121,6 +121,21 @@
                 }
             });
             return false; // 阻止表单默认提交
+        });
+
+        // 清除按钮点击事件
+        document.getElementById('resetBtn').addEventListener('click', function () {
+            // 重新加载表格，传递空的搜索参数
+            projectTable.reload({
+                where: {
+                    project_name: '',
+                    project_source: '',
+                    category_name: '',
+                },
+                page: {
+                    curr: 1 // 重新从第1页开始
+                }
+            });
         });
 
         // 监听表格中的工具事件

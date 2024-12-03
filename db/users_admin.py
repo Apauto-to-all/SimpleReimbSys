@@ -51,7 +51,7 @@ class UsersAdminOperation:
                     return 0, []
 
                 sql = """
-                SELECT users.username, users.real_name, roles.role_name
+                SELECT users.user_id, users.username, users.real_name, users.role_id, roles.role_name
                 FROM users
                 LEFT JOIN roles
                 ON users.role_id = roles.role_id
@@ -61,7 +61,7 @@ class UsersAdminOperation:
                 LIMIT $4 OFFSET $5
                 """
                 data = await conn.fetch(
-                    sql, username, real_name, role_name, limit, page
+                    sql, username, real_name, role_name, limit, (page - 1) * limit
                 )
                 data = [dict(record) for record in data]
                 return count, data

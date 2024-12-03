@@ -4,6 +4,184 @@
 
 {% block content %}
 
+<!-- 查询用户 -->
 <h1>查询用户</h1>
+
+<!-- 添加搜索框 -->
+<form class="layui-form layui-row layui-col-space16" lay-filter="searchUserForm">
+    <!-- 用户名 -->
+    <div class="layui-col-md4">
+        <div class="layui-input-wrap">
+            <div class="layui-input-prefix">
+                <i class="layui-icon layui-icon-user"></i>
+            </div>
+            <input type="text" name="username" value="" placeholder="输入用户名" class="layui-input" lay-affix="clear">
+        </div>
+    </div>
+
+    <!-- 真实姓名 -->
+    <div class="layui-col-md4">
+        <div class="layui-input-wrap">
+            <div class="layui-input-prefix">
+                <i class="layui-icon layui-icon-username"></i>
+            </div>
+            <input type="text" name="real_name" value="" placeholder="输入真实姓名" class="layui-input" lay-affix="clear">
+        </div>
+    </div>
+
+    <!-- 角色 -->
+    <div class="layui-col-md4">
+        <div class="layui-input-wrap">
+            <div class="layui-input-prefix">
+                <i class="layui-icon layui-icon-auz"></i>
+            </div>
+            <select name="role_name" lay-search>
+                <option value="">请选择角色</option>
+            </select>
+        </div>
+    </div>
+
+    <!-- 搜索和清除按钮 -->
+    <div class="layui-col-md12 layui-btn-container">
+        <button class="layui-btn" lay-submit lay-filter="searchUser">搜索</button>
+        <button type="button" class="layui-btn layui-btn-primary" id="resetBtn">清除</button>
+    </div>
+</form>
+
+<!-- 用户表格 -->
+<table class="layui-hide" id="userTable" lay-filter="userTable"></table>
+
+<!-- 行内工具栏 -->
+<script type="text/html" id="actions">
+    <a class="layui-btn layui-btn-xs" lay-event="view">查看</a>
+    <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="delete">删除</a>
+</script>
+
+<!-- 查询用户脚本 -->
+<script>
+    layui.use(function () {
+        var table = layui.table;
+        var form = layui.form;
+        var layer = layui.layer;
+
+        // 页面加载时获取角色数据
+        fetch('/role/api/search_all')
+            .then(response => response.json())
+            .then(res => {
+                if (res.data) {
+                    const select = document.querySelector('select[name="role_name"]');
+                    res.data.forEach(role_info => {
+                        const option = document.createElement('option');
+                        option.value = role_info.role_name;
+                        option.textContent = role_info.role_name;
+                        select.appendChild(option);
+                    });
+                    form.render('select'); // 刷新选择框渲染
+                }
+            })
+            .catch(err => {
+                console.error(err);
+                layer.alert('无法获取类别数据，请稍后再试。', { icon: 5 });
+            });
+
+        // 初始化表格
+        var userTable = table.render({
+            elem: '#userTable',
+            url: '/admin/user/search',
+            method: 'GET',
+            page: true,
+            limits: [10, 20, 30, 50],
+            limit: 10,
+            toolbar: '#toolbarDemo', // 引用工具栏模板
+            cols: [[
+                { field: 'user_id', title: 'ID', width: 80, sort: true },
+                { field: 'username', title: '用户名', minWidth: 150 },
+                { field: 'real_name', title: '真实姓名', minWidth: 150 },
+                { field: 'role_name', title: '角色', minWidth: 120 },
+                { fixed: 'right', title: '操作', toolbar: '#actions', width: 150 }
+            ]],
+            title: '用户列表',
+        });
+
+        // 监听搜索表单提交
+        form.on('submit(searchUser)', function (data) {
+            var field = data.field; // 获取表单字段
+            // 重新加载表格，传递搜索参数
+            userTable.reload({
+                where: {
+                    username: field.username,
+                    real_name: field.real_name,
+                    role_name: field.role_name
+                },
+                page: {
+                    curr: 1 // 重新从第1页开始
+                }
+            });
+            return false; // 阻止表单默认提交
+        });
+
+        // 清除按钮点击事件
+        document.getElementById('resetBtn').addEventListener('click', function () {
+            // 重新加载表格，传递空的搜索参数
+            userTable.reload({
+                where: {
+                    username: '',
+                    real_name: '',
+                    role_name: ''
+                },
+                page: {
+                    curr: 1 // 重新从第1页开始
+                }
+            });
+        });
+
+        // 监听行工具事件
+        table.on('tool(userTable)', function (obj) {
+            var data = obj.data;
+            var event = obj.event;
+            if (event === 'view') {
+                // 查看用户详情
+                layer.open({
+                    type: 1,
+                    title: '用户详情',
+                    content: `
+                        <div style="padding: 20px;">
+                            <p><strong>用户ID:</strong> ${data.user_id}</p>
+                            <p><strong>用户名:</strong> ${data.username}</p>
+                            <p><strong>真实姓名:</strong> ${data.real_name}</p>
+                            <p><strong>角色:</strong> ${data.role_name}</p>
+                        </div>
+                    `,
+                    area: ['400px', '300px']
+                });
+            } else if (event === 'delete') {
+                // 删除用户
+                layer.confirm('确定删除该用户吗？', function (index) {
+                    fetch(`/admin/user/delete/${data.user_id}`, {
+                        method: 'DELETE',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        }
+                    })
+                        .then(response => response.json())
+                        .then(res => {
+                            if (res.status === 'success') {
+                                layer.msg('删除成功', { icon: 1 });
+                                userTable.reload();
+                            } else {
+                                layer.alert('删除失败: ' + res.message, { icon: 2 });
+                            }
+                        })
+                        .catch(err => {
+                            console.error(err);
+                            layer.alert('请求失败，请稍后再试。', { icon: 5 });
+                        });
+                    layer.close(index);
+                });
+            }
+        });
+
+    });
+</script>
 
 {% endblock %}
