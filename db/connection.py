@@ -26,6 +26,7 @@ from .users_admin import UsersAdminOperation
 from .category_admin import CategoryAdminOperation
 from .project_admin import ProjectAdminOperation
 from .role import RoleTable
+from .assign import AssignOperation
 
 
 # 数据库操作类
@@ -35,6 +36,7 @@ class DatabaseOperation(
     CategoryAdminOperation,
     ProjectAdminOperation,
     RoleTable,
+    AssignOperation,
 ):
     _instance = None  # 单例模式
     error_mun = 0  # 错误次数
