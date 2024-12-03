@@ -22,20 +22,36 @@ async def user_select_all(access_token: str) -> dict:
     :return: 用户信息
     """
     try:
-        if access_token:
-            username = await password_utils.get_user_from_jwt(access_token)
-            if username:
-                user_dict = await operate.user_select_one_all(username)
-                {
-                    "user_id": "1",
-                    "username": "admin",
-                    "password": "加密后的密码",
-                    "real_name": "管理员",
-                    "role_id": "1",
-                    "role_name": "管理员",
-                }
-                if user_dict:
-                    return user_dict
+        username = await password_utils.get_user_from_jwt(access_token)
+        if username:
+            user_dict = await operate.user_select_one_all(username)
+            {
+                "user_id": "1",
+                "username": "admin",
+                "password": "加密后的密码",
+                "real_name": "管理员",
+                "role_id": "1",
+                "role_name": "管理员",
+            }
+            if user_dict:
+                return user_dict
+    except Exception as e:
+        logger.error(e)
+        logger.error(traceback.format_exc())
+    return {}
+
+
+# 获取用户信息，根据用户名
+async def user_select_all_from_username(username: str) -> dict:
+    """
+    获取用户信息，根据用户名
+    :param username: 用户名
+    :return: 用户信息
+    """
+    try:
+        user_dict = await operate.user_select_one_all(username)
+        if user_dict:
+            return user_dict
     except Exception as e:
         logger.error(e)
         logger.error(traceback.format_exc())

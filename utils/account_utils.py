@@ -39,22 +39,6 @@ async def create_account(
     return False
 
 
-# 检查用户名是否存在
-async def check_username_exist(username: str) -> bool:
-    """
-    判断用户名是否存在
-    :param username: 用户名
-    :return: 用户名存在返回True，用户名不存在返回False
-    """
-    try:
-        if await operate.user_select_one_all(username):
-            return True
-    except Exception as e:
-        logger.error(e)
-        logger.error(traceback.format_exc())
-    return False
-
-
 # 查询用户信息
 async def saerch_user_info(
     page: int, limit: int, username: str, real_name: str, role_name: str

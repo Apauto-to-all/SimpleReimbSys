@@ -48,7 +48,7 @@ async def create_finance_account(
         return JSONResponse(content={"message": "没有权限"}, status_code=400)
 
     # 判断用户名是否存在
-    if await account_utils.check_username_exist(username):
+    if await user_utils.user_select_all_from_username(username):
         return JSONResponse(content={"message": "用户名已存在"}, status_code=400)
 
     # 判断密码是否一致

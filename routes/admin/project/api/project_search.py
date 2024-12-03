@@ -22,43 +22,6 @@ router = APIRouter()
 templates = Jinja2Templates(directory="templates")
 
 
-# 创建项目
-@router.post("/admin/project/api/create")
-async def create_project(
-    project_name: str = Form(""),  # 项目名称
-    project_source: str = Form(""),  # 项目来源
-    category_name: str = Form(""),  # 所属类别
-    total_amount: float = Form(0.0),  # 立项金额
-    access_token: Optional[str] = Cookie(None),
-):
-    if (
-        not project_name
-        or not project_source
-        or not category_name
-        or not total_amount
-        or not access_token
-        or total_amount < 0
-    ):
-        return JSONResponse(content={"message": "参数错误"}, status_code=400)
-
-    user_dict = await user_utils.user_select_all(access_token)
-    if user_dict.get("role_name") != "管理员":
-        return JSONResponse(content={"message": "无权限"}, status_code=403)
-
-    if not await category_utils.check_category(category_name):
-        return JSONResponse(content={"message": "项目类别不存在"}, status_code=400)
-
-    if await project_utils.check_project(project_name):
-        return JSONResponse(content={"message": "项目已存在"}, status_code=400)
-
-    if await project_utils.create_project(
-        project_name, project_source, category_name, total_amount, total_amount
-    ):
-        return JSONResponse(content={"message": "创建成功"}, status_code=200)
-
-    return JSONResponse(content={"message": "创建失败"}, status_code=400)
-
-
 # 查询项目
 @router.get("/admin/project/api/search")
 async def search_project(
