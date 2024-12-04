@@ -13,7 +13,7 @@ logger = logging.getLogger(__name__)
 
 class AssignOperation:
     # 分配报销(项目)类别
-    async def category_assign(self, category_name: str, username: str):
+    async def category_assign(self, category_name: str, usernames: list):
         async with self.pool.acquire() as conn:
             try:
                 insert_sql = """
@@ -24,9 +24,9 @@ class AssignOperation:
                 WHERE u.username = $1
                 ON CONFLICT DO NOTHING
                 """
-                await conn.execute(insert_sql, username, category_name)
+                for username in usernames:
+                    await conn.execute(insert_sql, username, category_name)
                 return True
-
             except Exception as e:
                 logger.error(traceback.format_exc())
                 logger.error(e)

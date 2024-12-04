@@ -53,9 +53,18 @@ async def saerch_user_info(
     :return: 用户信息列表
     """
     try:
-        return await operate.user_admin_search_list(
+        {
+            "user_id": 1,
+            "username": "username",
+            "real_name": "真实姓名",
+            "role_id": 1,
+            "role_name": "角色",
+        }
+
+        user_dict = await operate.user_admin_search_list(
             page, limit, username, real_name, role_name
         )
+        return user_dict
     except Exception as e:
         logger.error(e)
         logger.error(traceback.format_exc())

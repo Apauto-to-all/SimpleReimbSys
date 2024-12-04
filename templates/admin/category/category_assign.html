@@ -113,7 +113,121 @@
 
             if (event === 'add') {
                 // 分配财务人员,添加人员
+                var category_name = data.category_name; // 获取当前类别ID
+                var category_usernames = data.username_list; // 获取当前类别已分配的财务人员
 
+                layer.open({
+                    type: 1,
+                    title: '分配财务人员',
+                    area: ['60%', '60%'],
+                    content: `<div style="padding:20px;">
+                        <form class="layui-form" lay-filter="searchFinanceForm">
+                            <div class="layui-form-item">
+                                <div class="layui-inline">
+                                    <input type="text" name="username" placeholder="用户名" autocomplete="off" class="layui-input">
+                                </div>
+                                <div class="layui-inline">
+                                    <input type="text" name="real_name" placeholder="真实姓名" autocomplete="off" class="layui-input">
+                                </div>
+                                <button class="layui-btn" lay-submit lay-filter="searchFinance">搜索</button>
+                            </div>
+                        </form>
+                        <table id="financeTable" lay-filter="financeTable"></table>
+                    </div>`,
+                    success: function (layero, index) {
+                        // 渲染表单
+                        form.render();
+
+                        // 初始化财务人员表格
+                        var financeTable = table.render({
+                            elem: '#financeTable',
+                            url: '/admin/user/api/search',
+                            method: 'GET',
+                            where: {
+                                role_name: '财务人员'
+                            },
+                            page: true,
+                            cols: [[
+                                { type: 'checkbox' },
+                                { field: 'user_id', title: 'ID', width: 80, sort: true },
+                                { field: 'username', title: '用户名', width: 150 },
+                                { field: 'real_name', title: '真实姓名', width: 150 },
+                            ]],
+                            parseData: function (res) {
+                                // 默认选中已分配的财务人员，并锁定复选框，禁止取消选择
+                                res.data.forEach(function (item) {
+                                    if (category_usernames.includes(item.username)) {
+                                        item.LAY_CHECKED = true; // 选中
+                                        item.LAY_DISABLED = true; // 禁用
+                                    }
+                                });
+                                return res;
+                            }
+                        });
+
+                        // 监听搜索表单提交
+                        form.on('submit(searchFinance)', function (data) {
+                            var field = data.field;
+                            // 重载财务人员表格，传递搜索参数
+                            financeTable.reload({
+                                where: {
+                                    username: field.username,
+                                    real_name: field.real_name,
+                                    role_name: '财务人员' // 固定为财务人员角色
+                                },
+                                page: { curr: 1 } // 从第一页开始
+                            });
+                            return false; // 阻止表单跳转
+                        });
+                    },
+                    btn: ['确认分配', '取消'],
+                    yes: function (index, layero) {
+                        // 获取选中的财务人员
+                        var checkStatus = table.checkStatus('financeTable');
+                        var selectedData = checkStatus.data;
+
+                        if (selectedData.length === 0) {
+                            layer.msg('请至少选择一名财务人员');
+                            return;
+                        }
+
+                        // 准备提交的数据
+                        var usernames = selectedData.map(function (item) {
+                            return item.username;
+                        });
+
+                        // 调用分配API
+                        fetch('/admin/category/api/assign', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/x-www-form-urlencoded'
+                            },
+                            body: new URLSearchParams(
+                                {
+                                    category_name: category_name,
+                                    usernames: usernames
+                                }
+                            )
+                        }).then(response => {
+                            if (response.status === 200) {
+                                return response.json().then(res => {
+                                    // 成功处理
+                                    layer.msg("成功：" + res.message, { icon: 1 });
+                                    layer.close(index); // 关闭弹窗
+                                    categoryTable.reload(); // 重新加载类别表格
+                                });
+                            } else {
+                                return response.json().then(res => {
+                                    // 显示错误信息
+                                    layer.alert('失败：' + res.message, { icon: 2 });
+                                });
+                            }
+                        }).catch(error => {
+                            console.error('Error:', error);
+                            layer.alert('失败：' + error, { icon: 2 });
+                        });
+                    }
+                });
             } else if (event === 'manage') {
                 // 管理人员.查看和删除人员
 
