@@ -45,3 +45,37 @@ async def unassign_category(category_name: str, usernames: list) -> bool:
         logger.error(e)
         logger.error(traceback.format_exc())
     return False
+
+
+# 分配项目
+async def assign_project(project_name: str, usernames: list) -> bool:
+    """
+    分配项目
+    :param project_name: 项目名称
+    :param usernames: 用户名列表
+    :return: 分配项目成功返回True，分配项目失败返回False
+    """
+    try:
+        if await operate.project_assign(project_name, usernames):
+            return True
+    except Exception as e:
+        logger.error(e)
+        logger.error(traceback.format_exc())
+    return False
+
+
+# 删除项目的分配人员
+async def unassign_project(project_name: str, usernames: list) -> bool:
+    """
+    删除项目的分配人员
+    :param project_name: 项目名称
+    :param usernames: 用户名列表
+    :return: 删除项目的分配人员成功返回True，删除项目的分配人员失败返回False
+    """
+    try:
+        if await operate.project_unassign(project_name, usernames):
+            return True
+    except Exception as e:
+        logger.error(e)
+        logger.error(traceback.format_exc())
+    return False

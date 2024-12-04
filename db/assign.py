@@ -86,3 +86,43 @@ class AssignOperation:
                 logger.error(traceback.format_exc())
                 logger.error(e)
                 return False
+
+    # 分配项目
+    async def project_assign(self, project_name: str, usernames: list):
+        async with self.pool.acquire() as conn:
+            try:
+                insert_sql = """
+                INSERT INTO projects_manager (employee_id, project_id)
+                SELECT u.user_id, p.project_id
+                FROM users u
+                JOIN projects p ON p.project_name = $2
+                WHERE u.username = $1
+                ON CONFLICT DO NOTHING
+                """
+                for username in usernames:
+                    await conn.execute(insert_sql, username, project_name)
+                return True
+            except Exception as e:
+                logger.error(traceback.format_exc())
+                logger.error(e)
+                return False
+
+    # 删除项目的分配人员
+    async def project_unassign(self, project_name: str, usernames: list):
+        async with self.pool.acquire() as conn:
+            try:
+                delete_sql = """
+                DELETE FROM projects_manager pm
+                USING users u, projects p
+                WHERE pm.employee_id = u.user_id
+                AND pm.project_id = p.project_id
+                AND u.username = $1
+                AND p.project_name = $2
+                """
+                for username in usernames:
+                    await conn.execute(delete_sql, username, project_name)
+                return True
+            except Exception as e:
+                logger.error(traceback.format_exc())
+                logger.error(e)
+                return False
