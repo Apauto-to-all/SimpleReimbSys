@@ -66,3 +66,23 @@ class AssignOperation:
                 logger.error(traceback.format_exc())
                 logger.error(e)
                 return False
+
+    # 删除报销(项目)类别的分配人员
+    async def category_unassign(self, category_name: str, usernames: list):
+        async with self.pool.acquire() as conn:
+            try:
+                delete_sql = """
+                DELETE FROM categories_manager cm
+                USING users u, categories c
+                WHERE cm.finance_id = u.user_id
+                AND cm.category_id = c.category_id
+                AND u.username = $1
+                AND c.category_name = $2
+                """
+                for username in usernames:
+                    await conn.execute(delete_sql, username, category_name)
+                return True
+            except Exception as e:
+                logger.error(traceback.format_exc())
+                logger.error(e)
+                return False
