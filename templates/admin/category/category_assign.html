@@ -152,6 +152,14 @@
                                 { field: 'user_id', title: 'ID', width: 80, sort: true },
                                 { field: 'username', title: '用户名', width: 150 },
                                 { field: 'real_name', title: '真实姓名', width: 150 },
+                                {
+                                    field: 'allocation_name_list', title: '已分配类别',
+                                    templet: function (d) {
+                                        return d.allocation_name_list.length > 0
+                                            ? d.allocation_name_list.join(', ')
+                                            : '<span style="color: red;">未分配类别</span>';
+                                    }
+                                },
                             ]],
                             parseData: function (res) {
                                 // 默认选中已分配的财务人员，并锁定复选框，禁止取消选择

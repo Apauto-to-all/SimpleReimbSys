@@ -1,3 +1,4 @@
+from itertools import count
 import traceback
 import logging
 
@@ -58,13 +59,17 @@ async def saerch_user_info(
             "username": "username",
             "real_name": "真实姓名",
             "role_id": 1,
-            "role_name": "角色",
+            "role_name": "管理员，财务人员，报销人员",
+            "allocation_name_list": ["category_name1", "project_name2"],
         }
-
-        user_dict = await operate.user_admin_search_list(
+        count, data = await operate.user_admin_search_list(
             page, limit, username, real_name, role_name
         )
-        return user_dict
+        for record in data:
+            record["allocation_name_list"] = await operate.user_allocation_name_list(
+                record["user_id"], record["role_name"]
+            )
+        return count, data
     except Exception as e:
         logger.error(e)
         logger.error(traceback.format_exc())
