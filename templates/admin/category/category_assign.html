@@ -122,7 +122,7 @@
                     title: '分配财务人员',
                     area: ['60%', '60%'],
                     content: `<div style="padding:20px;">
-                        <form class="layui-form" lay-filter="searchFinanceForm">
+                        <form class="layui-form">
                             <div class="layui-form-item">
                                 <div class="layui-inline">
                                     <input type="text" name="username" placeholder="用户名" autocomplete="off" class="layui-input">
@@ -136,9 +136,6 @@
                         <table id="financeTable" lay-filter="financeTable"></table>
                     </div>`,
                     success: function (layero, index) {
-                        // 渲染表单
-                        form.render();
-
                         // 初始化财务人员表格
                         var financeTable = table.render({
                             elem: '#financeTable',
@@ -204,7 +201,7 @@
                         var usernames = selectedData.map(function (item) {
                             return item.username;
                         });
-
+                        // 构造表单数据
                         var params = new URLSearchParams();
                         params.append('category_name', category_name);
                         usernames.forEach(function (username) {
