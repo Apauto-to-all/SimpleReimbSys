@@ -63,9 +63,10 @@ class CategoryAdminOperation:
                 SELECT
                     c.category_id,
                     c.category_name,
-                    COALESCE(array_agg(cm.finance_id) FILTER (WHERE cm.finance_id IS NOT NULL), '{{}}') AS finance_id_list
+                    COALESCE(array_agg(u.username) FILTER (WHERE u.username IS NOT NULL), '{{}}') AS username_list
                 FROM categories c
                 LEFT JOIN categories_manager cm ON c.category_id = cm.category_id
+                LEFT JOIN users u ON cm.finance_id = u.user_id
                 WHERE c.category_name ILIKE '%' || $1 || '%'
                 GROUP BY c.category_id
                 {assign_condition}

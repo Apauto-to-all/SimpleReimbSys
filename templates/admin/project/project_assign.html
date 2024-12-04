@@ -125,10 +125,10 @@
                     }
                 },
                 {
-                    field: 'employee_id_list', title: '报销人员', width: 200,
+                    field: 'username_list', title: '报销人员', width: 200,
                     templet: function (d) {
-                        return d.employee_id_list.length > 0
-                            ? d.employee_id_list.join(', ')
+                        return d.username_list.length > 0
+                            ? d.username_list.join(', ')
                             : '<span style="color: red;">未分配报销人员</span>';
                     }
                 },

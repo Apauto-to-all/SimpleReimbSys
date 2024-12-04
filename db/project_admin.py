@@ -108,10 +108,11 @@ class ProjectAdminOperation:
                     c.category_name,
                     p.total_amount,
                     p.balance,
-                    COALESCE(array_agg(pm.employee_id) FILTER (WHERE pm.employee_id IS NOT NULL), '{{}}') AS employee_id_list
+                    COALESCE(array_agg(u.username) FILTER (WHERE u.username IS NOT NULL), '{{}}') AS username_list
                 FROM projects p
                 JOIN categories c ON p.category_id = c.category_id
                 LEFT JOIN projects_manager pm ON p.project_id = pm.project_id
+                LEFT JOIN users u ON pm.employee_id = u.user_id
                 WHERE p.project_name ILIKE '%' || $1 || '%'
                 AND p.project_source ILIKE '%' || $2 || '%'
                 AND c.category_name ILIKE '%' || $3 || '%'

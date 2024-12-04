@@ -65,10 +65,10 @@
                 { field: 'category_id', title: 'ID', width: 80, sort: true },
                 { field: 'category_name', title: '类别名称', width: 200 },
                 {
-                    field: 'finance_id_list', title: '财务人员', width: 200,
+                    field: 'username_list', title: '财务人员', width: 200,
                     templet: function (d) {
-                        return d.finance_id_list.length > 0
-                            ? d.finance_id_list.join(', ')
+                        return d.username_list.length > 0
+                            ? d.username_list.join(', ')
                             : '<span style="color: red;">未分配财务人员</span>';
                     }
                 },
