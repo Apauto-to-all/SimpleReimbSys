@@ -310,7 +310,33 @@
                 });
             } else if (event === "delete") {
                 // 删除类别
-
+                layer.confirm('确认删除类别：“' + category_name + '” ？', function (index) {
+                    // 调用删除API
+                    fetch('/admin/category/api/delete', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/x-www-form-urlencoded'
+                        },
+                        body: new URLSearchParams({ category_name: category_name })
+                    }).then(response => {
+                        if (response.status === 200) {
+                            return response.json().then(res => {
+                                // 成功处理
+                                layer.msg("成功：" + res.message, { icon: 1 });
+                                layer.close(index); // 关闭弹窗
+                                categoryTable.reload(); // 重新加载类别表格
+                            });
+                        } else {
+                            return response.json().then(res => {
+                                // 显示错误信息
+                                layer.alert('失败：' + res.message, { icon: 2 });
+                            });
+                        }
+                    }).catch(error => {
+                        console.error('Error:', error);
+                        layer.alert('失败：' + error, { icon: 2 });
+                    });
+                });
             }
         });
     });
