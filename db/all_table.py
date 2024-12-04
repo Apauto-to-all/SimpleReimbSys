@@ -19,6 +19,7 @@ tables_json = {
     "categories": {  # 报销类别表
         "category_id": "serial",  # 类别ID：自增整数
         "category_name": "varchar(50) not null UNIQUE",  # 类别名称：长度50，字符串，不能为空，唯一
+        "is_deleted": "boolean not null default false",  # 是否删除：布尔，不能为空，默认为 false
         "primary_key": "(category_id)",  # 主键：category_id
     },
     "categories_manager": {  # 财务人员负责类别表
@@ -33,12 +34,12 @@ tables_json = {
         "category_id": "int not null references categories(category_id)",  # 类别ID，外键关联categories表
         "total_amount": "double precision",  # 立项金额：double
         "balance": "double precision",  # 余额：double
+        "is_deleted": "boolean not null default false",  # 是否删除：布尔，不能为空，默认为 false
         "primary_key": "(project_id)",  # 主键：project_id
     },
     "projects_manager": {  # 报销人员可报销项目表
         "employee_id": "int not null references users(user_id)",  # 报销人员ID，外键关联users表
         "project_id": "int not null references projects(project_id)",  # 项目ID，外键关联projects表
-        "employee_amount": "double precision",  # 报销人员的金额：double，报销后项目余额减少，报销人员余额增加
         "primary_key": "(employee_id, project_id)",  # 组合主键：employee_id, project_id
     },
     "reimbursement_applications": {  # 报销审核表

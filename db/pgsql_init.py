@@ -125,20 +125,36 @@ class PgsqlInit:
                 """,
                 table_name,
             )
-            # 获取已存在的列名
+            # 获取已存在的列名集合
             existing_column_names = {row["column_name"] for row in existing_columns}
-            # 检查列是否存在，不存在就创建
-            for column_name, column_def in columns.items():
-                if (
-                    column_name not in existing_column_names
-                    and column_name != "primary_key"
-                ):
-                    await self.conn.execute(
-                        f"""
-                        ALTER TABLE {table_name}
-                        ADD COLUMN {column_name} {column_def}
-                        """
-                    )
+            # 获取定义中的列名集合（不包括 primary_key）
+            defined_columns = set(columns.keys()) - {"primary_key"}
+            # 需要新增的列
+            columns_to_add = defined_columns - existing_column_names
+            # 需要删除的列
+            columns_to_drop = existing_column_names - defined_columns
+            # 获取主键列名
+            primary_key_columns = set(columns["primary_key"].strip("()").split(","))
+            primary_key_columns = {col.strip() for col in primary_key_columns}
+            # 排除主键列，避免删除
+            columns_to_drop -= primary_key_columns
+            # 添加缺失的列
+            for column_name in columns_to_add:
+                column_def = columns[column_name]
+                await self.conn.execute(
+                    f"""
+                    ALTER TABLE {table_name}
+                    ADD COLUMN {column_name} {column_def}
+                    """
+                )
+            # 删除多余的列
+            for column_name in columns_to_drop:
+                await self.conn.execute(
+                    f"""
+                    ALTER TABLE {table_name}
+                    DROP COLUMN {column_name} CASCADE
+                    """
+                )
 
     async def create_table(self):
         try:
