@@ -57,3 +57,33 @@ async def create_project(
         return JSONResponse(content={"message": "创建成功"}, status_code=200)
 
     return JSONResponse(content={"message": "创建失败"}, status_code=400)
+
+
+# 删除项目
+@router.post("/admin/project/api/delete")
+async def delete_project(
+    project_name: str = Form(""),  # 项目名称
+    access_token: Optional[str] = Cookie(None),
+):
+    if not project_name or not access_token:
+        return JSONResponse(content={"message": "参数错误"}, status_code=400)
+
+    user_dict = await user_utils.user_select_all(access_token)
+    if user_dict.get("role_name") != "管理员":
+        return JSONResponse(content={"message": "无权限"}, status_code=403)
+
+    if not await project_utils.check_project(project_name):
+        return JSONResponse(content={"message": "项目不存在"}, status_code=400)
+
+    if await project_utils.search_project_assign_users(project_name):
+        return JSONResponse(
+            content={
+                "message": "该项目已被分配给报销人员，请先手动删除该项目下的报销人员"
+            },
+            status_code=400,
+        )
+
+    if await project_utils.delete_project(project_name):
+        return JSONResponse(content={"message": "删除成功"}, status_code=200)
+
+    return JSONResponse(content={"message": "删除失败"}, status_code=400)

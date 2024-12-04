@@ -12,8 +12,6 @@ from utils import password_utils
 
 operate = DatabaseOperation()
 
-# 报销(项目)类别工具类
-
 
 # 检测报销(项目)类别是否存在
 async def check_category(category_name: str) -> bool:
@@ -84,3 +82,51 @@ async def search_all_category() -> list:
         logger.error(e)
         logger.error(traceback.format_exc())
     return list_data
+
+
+# 查询报销(项目)类别下面的项目
+async def search_category_projects(category_name: str) -> list:
+    """
+    查询报销(项目)类别下面的项目
+    :param category_name: 报销(项目)类别名称
+    :return: 返回查询到的项目列表
+    """
+    list_data = []
+    try:
+        list_data = await operate.category_search_projects(category_name)
+    except Exception as e:
+        logger.error(e)
+        logger.error(traceback.format_exc())
+    return list_data
+
+
+# 查询报销(项目)类别分配的财务人员
+async def search_category_assign_users(category_name: str) -> list:
+    """
+    查询报销(项目)类别分配的财务人员
+    :param category_name: 报销(项目)类别名称
+    :return: 返回查询到的财务人员列表
+    """
+    list_data = []
+    try:
+        list_data = await operate.category_search_assign_users(category_name)
+    except Exception as e:
+        logger.error(e)
+        logger.error(traceback.format_exc())
+    return list_data
+
+
+# 删除报销(项目)类别
+async def delete_category(category_name: str) -> bool:
+    """
+    删除报销(项目)类别
+    :param category_name: 报销(项目)类别名称
+    :return: 删除报销(项目)类别成功返回True，删除报销(项目)类别失败返回False
+    """
+    try:
+        if await operate.category_delete(category_name):
+            return True
+    except Exception as e:
+        logger.error(e)
+        logger.error(traceback.format_exc())
+    return False

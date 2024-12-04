@@ -42,3 +42,40 @@ async def admin_category_create(
         return JSONResponse(content={"message": "创建成功"}, status_code=200)
 
     return JSONResponse(content={"message": "创建失败"}, status_code=400)
+
+
+# 删除项目的api
+@router.post("/admin/category/api/delete", response_class=JSONResponse)
+async def admin_category_delete(
+    category_name: str = Form(""),
+    access_token: Optional[str] = Cookie(None),
+):
+    if not category_name or not access_token:
+        return JSONResponse(content={"message": "参数错误"}, status_code=400)
+
+    user_dict = await user_utils.user_select_all(access_token)
+    if user_dict.get("role_name") != "管理员":
+        return JSONResponse(content={"message": "无权限"}, status_code=403)
+
+    if not await category_utils.check_category(category_name):
+        return JSONResponse(content={"message": "类别不存在"}, status_code=400)
+
+    if await category_utils.search_category_projects(category_name):
+        return JSONResponse(
+            content={"message": "该类别下存在一些项目，请先手动删除这些项目"},
+            status_code=400,
+        )
+
+    if await category_utils.search_category_assign_users(category_name):
+        return JSONResponse(
+            content={
+                "message": "该项目已被分配给财务人员，请先手动删除该项目下的财务人员"
+            },
+            status_code=400,
+        )
+
+    # 删除类别
+    if await category_utils.delete_category(category_name):
+        return JSONResponse(content={"message": "删除成功"}, status_code=200)
+
+    return JSONResponse(content={"message": "删除失败"}, status_code=400)

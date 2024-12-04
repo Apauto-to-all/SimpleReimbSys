@@ -23,7 +23,7 @@ async def check_project(project_name: str) -> bool:
     :return: 项目存在返回True，项目不存在返回False
     """
     try:
-        if await operate.project_check(project_name):
+        if await operate.project_select_one_all(project_name):
             return True
     except Exception as e:
         logger.error(e)
@@ -94,3 +94,36 @@ async def search_project_info(
         logger.error(traceback.format_exc())
 
     return count, list_data
+
+
+# 搜索项目分配的报销人员
+async def search_project_assign_users(project_name: str) -> list:
+    """
+    搜索项目分配的报销人员
+    :param project_name: 项目名称
+    :return: 报销人员列表
+    """
+    try:
+        return await operate.project_search_assign_users(project_name)
+    except Exception as e:
+        logger.error(e)
+        logger.error(traceback.format_exc())
+
+    return []
+
+
+# 删除项目
+async def delete_project(project_name: str) -> bool:
+    """
+    删除项目
+    :param project_name: 项目名称
+    :return: 删除项目成功返回True，删除项目失败返回False
+    """
+    try:
+        if await operate.project_delete(project_name):
+            return True
+    except Exception as e:
+        logger.error(e)
+        logger.error(traceback.format_exc())
+
+    return False

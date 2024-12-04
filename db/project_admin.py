@@ -12,20 +12,21 @@ logger = logging.getLogger(__name__)
 
 
 class ProjectAdminOperation:
-    # 检测项目是否存在
-    async def project_check(self, project_name: str) -> bool:
+    # 获取一个项目的所有信息
+    async def project_select_one_all(self, project_name: str):
         async with self.pool.acquire() as conn:
             try:
-                sql = "SELECT * FROM projects WHERE project_name = $1"
+                sql = """
+                SELECT project_id, project_name, project_source, category_id, total_amount, balance, is_deleted
+                FROM projects
+                WHERE project_name = $1
+                """
                 result = await conn.fetch(sql, project_name)
-                if result:
-                    return True
-                else:
-                    return False
+                return result
             except Exception as e:
                 logger.error(traceback.format_exc())
                 logger.error(e)
-                return False
+                return []
 
     # 创建项目
     async def project_insert(
@@ -39,8 +40,8 @@ class ProjectAdminOperation:
         async with self.pool.acquire() as conn:
             try:
                 sql = """
-                    INSERT INTO projects (project_name, project_source, category_id, total_amount, balance)
-                    VALUES ($1, $2, $3, $4, $5)
+                INSERT INTO projects (project_name, project_source, category_id, total_amount, balance)
+                VALUES ($1, $2, $3, $4, $5)
                 """
                 await conn.execute(
                     sql,
@@ -88,6 +89,7 @@ class ProjectAdminOperation:
                     WHERE p.project_name ILIKE '%' || $1 || '%'
                     AND p.project_source ILIKE '%' || $2 || '%'
                     AND c.category_name ILIKE '%' || $3 || '%'
+                    AND p.is_deleted = false
                     GROUP BY p.project_id
                     {assign_condition}
                 ) sub
@@ -116,6 +118,7 @@ class ProjectAdminOperation:
                 WHERE p.project_name ILIKE '%' || $1 || '%'
                 AND p.project_source ILIKE '%' || $2 || '%'
                 AND c.category_name ILIKE '%' || $3 || '%'
+                AND p.is_deleted = false
                 GROUP BY p.project_id, c.category_name, p.category_id, p.project_name, p.project_source, p.total_amount, p.balance
                 {assign_condition}
                 ORDER BY p.project_id
@@ -136,3 +139,56 @@ class ProjectAdminOperation:
                 logger.error(traceback.format_exc())
                 logger.error(e)
                 return 0, []
+
+    # 搜索项目分配的报销人员
+    async def project_search_assign_users(self, project_name: str):
+        async with self.pool.acquire() as conn:
+            try:
+                sql = """
+                SELECT u.user_id, u.username
+                FROM users u
+                JOIN projects_manager pm ON u.user_id = pm.employee_id
+                JOIN projects p ON pm.project_id = p.project_id
+                WHERE p.project_name = $1
+                AND p.is_deleted = false
+                """
+                result = await conn.fetch(sql, project_name)
+                return [dict(record) for record in result]
+            except Exception as e:
+                logger.error(traceback.format_exc())
+                logger.error(e)
+                return []
+
+    # 删除项目
+    async def project_delete(self, project_name: str):
+        async with self.pool.acquire() as conn:
+            try:
+                # 首先检测在reimbursement_applications表中是否存在该类别，如果存在，设置is_deleted删除
+                check_sql = """
+                SELECT EXISTS (
+                    SELECT 1
+                    FROM reimbursement_applications ra
+                    JOIN projects p ON ra.project_id = p.project_id
+                    WHERE p.project_name = $1
+                )
+                """
+                check_result = await conn.fetchval(check_sql, project_name)
+                if check_result:
+                    # 如果存在，设置is_deleted删除
+                    sql = """
+                    UPDATE projects
+                    SET is_deleted = true
+                    WHERE project_name = $1
+                    """
+                else:
+                    # 如果不存在，直接删除
+                    sql = """
+                    DELETE FROM projects
+                    WHERE project_name = $1
+                    """
+                await conn.execute(sql, project_name)
+                return True
+            except Exception as e:
+                logger.error(traceback.format_exc())
+                logger.error(e)
+                return False
