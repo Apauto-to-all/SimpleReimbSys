@@ -68,8 +68,9 @@
 
 <!-- 右侧操作栏 -->
 <script type="text/html" id="assignTool">
-    <a class="layui-btn layui-btn-xs" lay-event="add">分配报销人员</a>
-    <a class="layui-btn layui-btn-xs" lay-event="manage">管理</a>
+    <a class="layui-btn layui-btn-sm" lay-event="add">分配人员</a>
+    <a class="layui-btn layui-btn-sm" lay-event="manage">管理人员</a>
+    <a class="layui-btn layui-btn-sm layui-btn-danger" lay-event="delete">删除</a>
 </script>
 
 <!-- 筛选报销项目脚本 -->
@@ -109,8 +110,8 @@
             limit: 10,
             cols: [[
                 { field: 'project_id', title: 'ID', width: 80, sort: true },
-                { field: 'project_name', title: '项目名称', minWidth: 150 },
-                { field: 'project_source', title: '项目来源', minWidth: 150 },
+                { field: 'project_name', title: '项目名称', minWidth: 200 },
+                { field: 'project_source', title: '项目来源', minWidth: 200 },
                 { field: 'category_name', title: '所属类别', minWidth: 100 },
                 {
                     field: 'total_amount', title: '立项金额 (￥)', minWidth: 100, sort: true,
@@ -125,14 +126,14 @@
                     }
                 },
                 {
-                    field: 'username_list', title: '报销人员', width: 200,
+                    field: 'username_list', title: '报销人员', minWidth: 200,
                     templet: function (d) {
                         return d.username_list.length > 0
                             ? d.username_list.join(', ')
                             : '<span style="color: red;">未分配报销人员</span>';
                     }
                 },
-                { fixed: 'right', title: '操作', templet: '#assignTool' }
+                { fixed: 'right', title: '操作', templet: '#assignTool', minWidth: 300 }
             ]],
             toolbar: '#toolbarDemo', // 添加工具条
             title: '报销项目表'
@@ -177,48 +178,14 @@
             var data = obj.data; // 当前行数据
             var event = obj.event; // 事件类型
 
-            if (event === 'view') {
-                // 查看项目详情
-                layer.open({
-                    type: 1,
-                    title: '项目详情',
-                    content: `
-                            <div style="padding: 20px;">
-                                <p><strong>项目ID:</strong> ${data.project_id}</p>
-                                <p><strong>项目名称:</strong> ${data.project_name}</p>
-                                <p><strong>项目来源:</strong> ${data.project_source}</p>
-                                <p><strong>所属类别:</strong> ${data.category_name}</p>
-                                <p><strong>立项金额:</strong> ￥${data.total_amount.toLocaleString()}</p>
-                                <p><strong>余额:</strong> ￥${data.balance.toLocaleString()}</p>
-                            </div>
-                        `,
-                    area: ['50%', '60%'],
-                });
+            if (event === 'add') {
+                // 弹出分配报销人员对话框
+            } else if (event === 'manage') {
+                // 管理人员.查看和删除人员
+
             } else if (event === 'delete') {
                 // 删除项目
-                layer.confirm('确定删除该项目吗？', function (index) {
-                    // 发送删除请求到后端
-                    fetch(`/admin/project/api/delete/${data.project_id}`, {
-                        method: 'DELETE',
-                        headers: {
-                            'Content-Type': 'application/json'
-                        }
-                    })
-                        .then(response => response.json())
-                        .then(res => {
-                            if (res.status === 'success') {
-                                layer.msg('删除成功', { icon: 1 });
-                                projectTable.reload();
-                            } else {
-                                layer.alert('删除失败: ' + res.message, { icon: 2 });
-                            }
-                        })
-                        .catch(err => {
-                            console.error(err);
-                            layer.alert('请求失败，请稍后再试。', { icon: 5 });
-                        });
-                    layer.close(index);
-                });
+
             }
         });
     });

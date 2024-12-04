@@ -43,8 +43,9 @@
 
 <!-- 右侧操作栏 -->
 <script type="text/html" id="assignTool">
-    <a class="layui-btn layui-btn-xs" lay-event="add">分配财务人员</a>
-    <a class="layui-btn layui-btn-xs" lay-event="manage">管理</a>
+    <a class="layui-btn layui-btn-sm" lay-event="add">分配人员</a>
+    <a class="layui-btn layui-btn-sm" lay-event="manage">管理人员</a>
+    <a class="layui-btn layui-btn-sm layui-btn-danger" lay-event="delete">删除</a>
 </script>
 
 <script>
@@ -72,7 +73,7 @@
                             : '<span style="color: red;">未分配财务人员</span>';
                     }
                 },
-                { fixed: 'right', title: '操作', templet: '#assignTool' }
+                { fixed: 'right', title: '操作', templet: '#assignTool', minWidth: 300 }
             ]],
             toolbar: '#toolbarDemo', // 添加工具条
             title: '报销(项目)类别表',
@@ -238,6 +239,9 @@
                 });
             } else if (event === 'manage') {
                 // 管理人员.查看和删除人员
+
+            } else if (event === "delete") {
+                // 删除类别
 
             }
         });
