@@ -102,14 +102,12 @@
             request: { pageName: 'page', limitName: 'limit' },
             page: true,
             cols: [[
-                { field: 'reimbursement_id', title: 'ID', width: 100, sort: true },
+                { field: 'reimbursement_id', title: 'ID', width: 80, sort: true },
                 { field: 'employee_username', title: '报销人员用户名', width: 130 },
-                { field: 'employee_real_name', title: '报销人员姓名', width: 130 },
                 { field: 'finance_username', title: '财务人员用户名', width: 130 },
-                { field: 'finance_real_name', title: '财务人员姓名', width: 130 },
                 { field: 'category_name', title: '类别名称', width: 120 },
                 { field: 'project_name', title: '项目名称', width: 150 },
-                { field: 'amount', title: '报销金额', width: 100, sort: true },
+                { field: 'amount', title: '报销金额', width: 120, sort: true },
                 { field: 'status', title: '报销状态', width: 100 },
                 {
                     field: 'submit_date', title: '提交时间', width: 160, templet: function (d) {
