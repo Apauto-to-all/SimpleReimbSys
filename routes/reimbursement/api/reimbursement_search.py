@@ -26,7 +26,10 @@ templates = Jinja2Templates(directory="templates")
 async def reimbursement_search(
     page: int = Query(1),
     limit: int = Query(10),
-    username: Optional[str] = Query(""),  # 用户名
+    employee_username: Optional[str] = Query(""),  # 报销人员用户名
+    employee_real_name: Optional[str] = Query(""),  # 报销人员真实姓名
+    finance_username: Optional[str] = Query(""),  # 财务人员用户名
+    finance_real_name: Optional[str] = Query(""),  # 财务人员真实姓名
     category_name: Optional[str] = Query(""),  # 类别名称
     project_name: Optional[str] = Query(""),  # 项目名称
     status: Optional[str] = Query(""),  # 报销状态，待审核，已审核，已拒绝
@@ -40,7 +43,11 @@ async def reimbursement_search(
     count, list_data = await reimbursement_utils.search_reimbursement_info(
         page,
         limit,
-        username,
+        user_dict.get("username"),
+        employee_username,
+        employee_real_name,
+        finance_username,
+        finance_real_name,
         category_name,
         project_name,
         status,

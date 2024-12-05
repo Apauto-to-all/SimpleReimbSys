@@ -1,9 +1,181 @@
 {% extends 'base.html' %}
 
-{% block title %}简易财务报销系统{% endblock %}
+{% block title %} 显示报销明细 {% endblock %}
 
 {% block content %}
 
-<h1>显示报销情况</h1>
+<h1>显示报销明细</h1>
+
+<!-- 搜索表单 -->
+<form class="layui-form" lay-filter="searchForm" id="searchForm" style="margin-bottom: 20px;">
+    <div class="layui-form-item">
+
+        <div class="layui-inline">
+            <label class="layui-form-label">报销人员用户名</label>
+            <div class="layui-input-inline">
+                <input type="text" name="employee_username" placeholder="请输入报销人员用户名" autocomplete="off"
+                    class="layui-input">
+            </div>
+        </div>
+
+        <div class="layui-inline">
+            <label class="layui-form-label">报销人员姓名</label>
+            <div class="layui-input-inline">
+                <input type="text" name="employee_real_name" placeholder="请输入报销人员姓名" autocomplete="off"
+                    class="layui-input">
+            </div>
+        </div>
+    </div>
+
+    <div class="layui-form-item">
+        <div class="layui-inline">
+            <label class="layui-form-label">财务人员用户名</label>
+            <div class="layui-input-inline">
+                <input type="text" name="finance_username" placeholder="请输入财务人员用户名" autocomplete="off"
+                    class="layui-input">
+            </div>
+        </div>
+
+        <div class="layui-inline">
+            <label class="layui-form-label">财务人员姓名</label>
+            <div class="layui-input-inline">
+                <input type="text" name="finance_real_name" placeholder="请输入财务人员姓名" autocomplete="off"
+                    class="layui-input">
+            </div>
+        </div>
+    </div>
+
+    <div class="layui-form-item">
+
+        <div class="layui-inline">
+            <label class="layui-form-label">项目名称</label>
+            <div class="layui-input-inline">
+                <input type="text" name="project_name" placeholder="请输入项目名称" autocomplete="off" class="layui-input">
+            </div>
+        </div>
+
+        <div class="layui-inline">
+            <label class="layui-form-label">类别名称</label>
+            <div class="layui-input-inline">
+                <input type="text" name="category_name" placeholder="请输入类别名称" autocomplete="off" class="layui-input">
+            </div>
+        </div>
+
+        <div class="layui-inline">
+            <label class="layui-form-label">报销状态</label>
+            <div class="layui-input-inline">
+                <select name="status">
+                    <option value="">全部</option>
+                    <option value="待审核">待审核</option>
+                    <option value="已审核">已审核</option>
+                    <option value="已拒绝">已拒绝</option>
+                </select>
+            </div>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <button class="layui-btn" lay-submit lay-filter="search">搜索</button>
+        <button type="reset" class="layui-btn layui-btn-primary" id="resetBtn">清除</button>
+    </div>
+</form>
+
+<!-- 表格容器 -->
+<table class="layui-hide" id="reimbursementTable" lay-filter="reimbursementTable"></table>
+
+<!-- 操作栏模板 -->
+<script type="text/html" id="operationTpl">
+    <a class="layui-btn layui-btn-normal layui-btn-sm" lay-event="view">查看</a>
+</script>
+
+<!-- 引入Layui的模块 -->
+<script>
+    layui.use(['table', 'form'], function () {
+        var table = layui.table;
+        var form = layui.form;
+
+        // 初始化表格
+        var tableIns = table.render({
+            elem: '#reimbursementTable',
+            url: '/reimbursement/api/search',
+            method: 'GET',
+            where: { page: 1, limit: 10 },
+            request: { pageName: 'page', limitName: 'limit' },
+            page: true,
+            cols: [[
+                { field: 'reimbursement_id', title: 'ID', width: 100, sort: true },
+                { field: 'employee_username', title: '报销人员用户名', width: 130 },
+                { field: 'employee_real_name', title: '报销人员姓名', width: 130 },
+                { field: 'finance_username', title: '财务人员用户名', width: 130 },
+                { field: 'finance_real_name', title: '财务人员姓名', width: 130 },
+                { field: 'category_name', title: '类别名称', width: 120 },
+                { field: 'project_name', title: '项目名称', width: 150 },
+                { field: 'amount', title: '报销金额', width: 100, sort: true },
+                { field: 'status', title: '报销状态', width: 100 },
+                {
+                    field: 'submit_date', title: '提交时间', width: 160, templet: function (d) {
+                        return new Date(d.submit_date * 1000).toLocaleString();
+                    }
+                },
+                {
+                    field: 'approve_date', title: '审核时间', width: 160, templet: function (d) {
+                        return d.approve_date ? new Date(d.approve_date * 1000).toLocaleString() : '未审核';
+                    }
+                },
+                { fixed: 'right', title: '操作', toolbar: '#operationTpl', width: 80 }
+            ]],
+        });
+
+        // 监听搜索表单提交
+        form.on('submit(search)', function (data) {
+            var field = data.field;
+            // 重新加载表格
+            tableIns.reload({
+                where: field,
+                page: { curr: 1 } // 从第一页重新开始
+            });
+            return false; // 阻止表单提交
+        });
+
+        // 清除按钮点击事件
+        document.getElementById('resetBtn').addEventListener('click', function () {
+            // 重新加载表格，传递空的筛选参数
+            tableIns.reload({
+                where: {},
+                page: {
+                    curr: 1 // 重新从第1页开始
+                }
+            });
+        });
+
+        // 监听表格操作按钮
+        table.on('tool(reimbursementTable)', function (obj) {
+            var data = obj.data;
+            if (obj.event === 'view') {
+                // 弹出查看详情的层
+                layer.open({
+                    type: 1,
+                    title: '报销详情',
+                    area: ['600px', '500px'],
+                    content: `
+                    <div style="padding: 20px;">
+                        <p><strong>报销ID：</strong>${data.reimbursement_id}</p>
+                        <p><strong>报销人员：</strong>${data.employee_real_name} (${data.employee_username})</p>
+                        <p><strong>财务人员：</strong>${data.finance_real_name || '未审核'} (${data.finance_username || '-'})</p>
+                        <p><strong>类别名称：</strong>${data.category_name}</p>
+                        <p><strong>项目名称：</strong>${data.project_name}</p>
+                        <p><strong>报销金额：</strong>${data.amount}</p>
+                        <p><strong>报销描述：</strong>${data.description}</p>
+                        <p><strong>提交时间：</strong>${new Date(data.submit_date * 1000).toLocaleString()}</p>
+                        <p><strong>审核时间：</strong>${data.approve_date ? new Date(data.approve_date * 1000).toLocaleString() : '未审核'}</p>
+                        <p><strong>审核意见：</strong>${data.comments || '无'}</p>
+                        <p><strong>报销状态：</strong>${data.status}</p>
+                    </div>
+                `
+                });
+            }
+        });
+
+    });
+</script>
 
 {% endblock %}
