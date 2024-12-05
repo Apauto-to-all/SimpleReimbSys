@@ -97,7 +97,7 @@ async def delete_account(
                 status_code=400,
             )
         # 判断财务人员是否进行了报销审核
-        if await account_utils.search_user_reimbursement(username, "财务人员"):
+        if await account_utils.check_user_reimbursement(username, "财务人员"):
             return JSONResponse(
                 content={"message": "该财务人员已进行报销审核，不允许删除！！！"},
                 status_code=400,
@@ -109,7 +109,7 @@ async def delete_account(
                 content={"message": "该报销人员已分配项目，请先删除分配的项目"},
                 status_code=400,
             )
-        if await account_utils.search_user_reimbursement(username, "报销人员"):
+        if await account_utils.check_user_reimbursement(username, "报销人员"):
             return JSONResponse(
                 content={"message": "该报销人员已进行报销，不允许删除！！！"},
                 status_code=400,

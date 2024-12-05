@@ -94,7 +94,7 @@ async def search_user_allocation(username: str, role_name: str) -> bool:
 
 
 # 查询用户参与的报销信息
-async def search_user_reimbursement(username: str, role_name: str) -> list:
+async def check_user_reimbursement(username: str, role_name: str) -> list:
     """
     查询用户参与的报销信息
     :param username: 用户名
@@ -102,7 +102,7 @@ async def search_user_reimbursement(username: str, role_name: str) -> list:
     :return: 查询到用户参与的报销信息返回True，未查询到用户参与的报销信息返回False
     """
     try:
-        result = await operate.user_reimbursement_allocation_all(username, role_name)
+        result = await operate.user_reimbursement_check(username, role_name)
         return result if result else []
     except Exception as e:
         logger.error(e)

@@ -71,37 +71,37 @@ class UsersAdminOperation:
                 logger.error(e)
                 return 0, []
 
-    # 查询用户参与分配的类别或项目
-    async def user_reimbursement_allocation_all(
-        self, username: str, role_name: str
-    ) -> list:
+    # 检测用户是否参与报销
+    async def user_reimbursement_check(self, username: str, role_name: str) -> bool:
         async with self.pool.acquire() as conn:
             try:
                 if role_name == "财务人员":
                     sql = """
-                    SELECT ra.reimbursement_id, ra.employee_id, ra.finance_id, ra.project_id, ra.amount, ra.description, ra.status, ra.submit_date, ra.approve_date, ra.comments
+                    SELECT 1
                     FROM reimbursement_applications ra
                     JOIN users u ON ra.finance_id = u.user_id
                     WHERE u.username = $1
+                    LIMIT 1
                     """
                 elif role_name == "报销人员":
                     sql = """
-                    SELECT ra.reimbursement_id, ra.employee_id, ra.finance_id, ra.project_id, ra.amount, ra.description, ra.status, ra.submit_date, ra.approve_date, ra.comments
+                    SELECT 1
                     FROM reimbursement_applications ra
                     JOIN users u ON ra.employee_id = u.user_id
                     WHERE u.username = $1
+                    LIMIT 1
                     """
                 else:
-                    return []
+                    return False
 
-                result = await conn.fetch(sql, username)
-                result = [dict(record) for record in result]
-                return result
+                if await conn.fetch(sql, username):
+                    return True
             except Exception as e:
                 error_info = traceback.format_exc()
                 logger.error(error_info)
                 logger.error(e)
-                return []
+
+            return False
 
     # 删除用户
     async def user_delete(self, username: str):
