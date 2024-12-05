@@ -1,4 +1,5 @@
 from itertools import count
+from re import L
 import traceback
 import logging
 
@@ -67,10 +68,59 @@ async def saerch_user_info(
         )
         for record in data:
             record["allocation_name_list"] = await operate.user_allocation_name_list(
-                record["user_id"], record["role_name"]
+                record["username"], record["role_name"]
             )
         return count, data
     except Exception as e:
         logger.error(e)
         logger.error(traceback.format_exc())
     return 0, []
+
+
+# 判断用户是否分配了项目类别或项目
+async def search_user_allocation(username: str, role_name: str) -> bool:
+    """
+    判断用户是否分配了项目类别或项目
+    :param username: 用户名
+    :return: 分配了项目类别或项目返回True，未分配项目类别或项目返回False
+    """
+    try:
+        if await operate.user_allocation_name_list(username, role_name):
+            return True
+    except Exception as e:
+        logger.error(e)
+        logger.error(traceback.format_exc())
+    return False
+
+
+# 查询用户参与的报销信息
+async def search_user_reimbursement(username: str, role_name: str) -> list:
+    """
+    查询用户参与的报销信息
+    :param username: 用户名
+    :param role_name: 角色
+    :return: 查询到用户参与的报销信息返回True，未查询到用户参与的报销信息返回False
+    """
+    try:
+        result = await operate.user_reimbursement_allocation_all(username, role_name)
+        return result if result else []
+    except Exception as e:
+        logger.error(e)
+        logger.error(traceback.format_exc())
+    return []
+
+
+# 删除账户
+async def delete_account(username: str) -> bool:
+    """
+    删除账户
+    :param username: 用户名
+    :return: 删除账户成功返回True，删除账户失败返回False
+    """
+    try:
+        if await operate.user_delete(username):
+            return True
+    except Exception as e:
+        logger.error(e)
+        logger.error(traceback.format_exc())
+    return False

@@ -64,3 +64,59 @@ async def create_finance_account(
         return JSONResponse(content={"message": "创建账户成功"}, status_code=200)
 
     return JSONResponse(content={"message": "创建账户失败"}, status_code=400)
+
+
+# 删除账户
+@router.post("/admin/user/api/delete_account")
+async def delete_account(
+    username: str = Form(""),  # 用户名
+    access_token: Optional[str] = Cookie(None),  # 访问令牌
+):
+    if not username or not access_token:
+        return JSONResponse(content={"message": "参数错误"}, status_code=400)
+
+    # 检测是否为管理员
+    user_dict = await user_utils.user_select_all(access_token)
+    if not user_dict.get("role_name") == "管理员":
+        return JSONResponse(content={"message": "没有权限"}, status_code=400)
+
+    # 判断用户名是否存在
+    if not await user_utils.user_select_all_from_username(username):
+        return JSONResponse(content={"message": "用户名不存在"}, status_code=400)
+
+    # 获取账户信息
+    account_dict = await user_utils.user_select_all_from_username(username)
+    if account_dict.get("role_name") == "管理员":
+        return JSONResponse(content={"message": "不能删除管理员账户"}, status_code=400)
+
+    if account_dict.get("role_name") == "财务人员":
+        # 判断财务人员是否分配了项目类别
+        if await account_utils.search_user_allocation(username, "财务人员"):
+            return JSONResponse(
+                content={"message": "该财务人员已分配项目类别，请先删除分配的项目类别"},
+                status_code=400,
+            )
+        # 判断财务人员是否进行了报销审核
+        if await account_utils.search_user_reimbursement(username, "财务人员"):
+            return JSONResponse(
+                content={"message": "该财务人员已进行报销审核，不允许删除！！！"},
+                status_code=400,
+            )
+
+    if account_dict.get("role_name") == "报销人员":
+        if await account_utils.search_user_allocation(username, "报销人员"):
+            return JSONResponse(
+                content={"message": "该报销人员已分配项目，请先删除分配的项目"},
+                status_code=400,
+            )
+        if await account_utils.search_user_reimbursement(username, "报销人员"):
+            return JSONResponse(
+                content={"message": "该报销人员已进行报销，不允许删除！！！"},
+                status_code=400,
+            )
+
+    # 删除账户
+    if await account_utils.delete_account(username):
+        return JSONResponse(content={"message": "删除账户成功"}, status_code=200)
+
+    return JSONResponse(content={"message": "删除账户失败"}, status_code=400)

@@ -70,3 +70,51 @@ class UsersAdminOperation:
                 logger.error(error_info)
                 logger.error(e)
                 return 0, []
+
+    # 查询用户参与分配的类别或项目
+    async def user_reimbursement_allocation_all(
+        self, username: str, role_name: str
+    ) -> list:
+        async with self.pool.acquire() as conn:
+            try:
+                if role_name == "财务人员":
+                    sql = """
+                    SELECT ra.reimbursement_id, ra.employee_id, ra.finance_id, ra.project_id, ra.amount, ra.description, ra.status, ra.submit_date, ra.approve_date, ra.comments
+                    FROM reimbursement_applications ra
+                    JOIN users u ON ra.finance_id = u.user_id
+                    WHERE u.username = $1
+                    """
+                elif role_name == "报销人员":
+                    sql = """
+                    SELECT ra.reimbursement_id, ra.employee_id, ra.finance_id, ra.project_id, ra.amount, ra.description, ra.status, ra.submit_date, ra.approve_date, ra.comments
+                    FROM reimbursement_applications ra
+                    JOIN users u ON ra.employee_id = u.user_id
+                    WHERE u.username = $1
+                    """
+                else:
+                    return []
+
+                result = await conn.fetch(sql, username)
+                result = [dict(record) for record in result]
+                return result
+            except Exception as e:
+                error_info = traceback.format_exc()
+                logger.error(error_info)
+                logger.error(e)
+                return []
+
+    # 删除用户
+    async def user_delete(self, username: str):
+        async with self.pool.acquire() as conn:
+            try:
+                sql = """
+                DELETE FROM users
+                WHERE username = $1
+                """
+                await conn.execute(sql, username)
+                return True
+            except Exception as e:
+                error_info = traceback.format_exc()
+                logger.error(error_info)
+                logger.error(e)
+                return False
