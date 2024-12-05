@@ -133,11 +133,7 @@
         document.getElementById('resetBtn').addEventListener('click', function () {
             // 重新加载表格，传递空的搜索参数
             userTable.reload({
-                where: {
-                    username: '',
-                    real_name: '',
-                    role_name: ''
-                },
+                where: {},
                 page: {
                     curr: 1 // 重新从第1页开始
                 }

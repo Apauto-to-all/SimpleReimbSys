@@ -33,6 +33,9 @@ async def user_select_all(access_token: str) -> dict:
                 "role_id": "1",
                 "role_name": "管理员",
             }
+            # 去除密码
+            user_dict = dict(user_dict)
+            user_dict.pop("password")
             if user_dict:
                 return user_dict
     except Exception as e:
