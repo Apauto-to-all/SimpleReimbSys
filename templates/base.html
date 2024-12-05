@@ -36,7 +36,7 @@
         <div class="layui-side layui-bg-black">
             <div class="layui-side-scroll">
                 <!-- 左侧导航区 -->
-                <ul class="layui-nav layui-nav-tree" lay-filter="test" id="nav">
+                <ul class="layui-nav layui-nav-tree">
                     {% if user_dict.role_name == "管理员" %}
                     <li class="layui-nav-item">
                         <a href="javascript:;">
@@ -65,16 +65,25 @@
                             <dd><a href="/admin/project/assign">分配项目</a></dd>
                         </dl>
                     </li>
-                    {% elif user_dict.role_name == "报销人员" %}
+                    <!-- 显示所有报销记录 -->
                     <li class="layui-nav-item">
-                        <a href="/finance/reimbursement"><i class="layui-icon layui-icon-form"></i> 报销管理</a>
+                        <a href="/reimbursement/show"><i class="layui-icon layui-icon-form"></i> 查看所有报销细明</a>
                     </li>
                     {% elif user_dict.role_name == "财务人员" %}
                     <li class="layui-nav-item">
-                        <a href="/user/project"><i class="layui-icon layui-icon-app"></i> 项目管理</a>
+                        <a href="/user/finance/audit"><i class="layui-icon layui-icon-app"></i> 审核报销</a>
                     </li>
+                    <!-- 显示所有报销记录 -->
                     <li class="layui-nav-item">
-                        <a href="/user/reimbursement"><i class="layui-icon layui-icon-form"></i> 报销管理</a>
+                        <a href="/reimbursement/show"><i class="layui-icon layui-icon-form"></i> 查看审核报销记录</a>
+                    </li>
+                    {% elif user_dict.role_name == "报销人员" %}
+                    <li class="layui-nav-item">
+                        <a href="/user/employee/apply"><i class="layui-icon layui-icon-form"></i> 报销申请</a>
+                    </li>
+                    <!-- 显示所有报销记录 -->
+                    <li class="layui-nav-item">
+                        <a href="/reimbursement/show"><i class="layui-icon layui-icon-form"></i> 查看报销记录</a>
                     </li>
                     {% else %}
                     <li class="layui-nav-item">

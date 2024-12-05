@@ -49,7 +49,7 @@ tables_json = {
         "finance_id": "int references users(user_id)",  # 财务人员ID，外键关联users表，报销前为空
         "amount": "double precision",  # 报销金额：double
         "description": "text",  # 报销描述：字符串
-        "status": "varchar(10) not null",  # 报销状态：长度10，字符串，不能为空（pending：待审核，approved：已审核，rejected：已拒绝）
+        "status": "varchar(10) not null",  # 报销状态：长度10，字符串，不能为空（待审核，已审核，已拒绝）
         "submit_date": "int",  # 提交日期：时间戳，int
         "approve_date": "int",  # 审核日期：时间戳，int
         "comments": "text",  # 审核意见：字符串

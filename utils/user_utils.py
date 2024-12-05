@@ -29,7 +29,7 @@ async def user_select_all(access_token: str) -> dict:
                 "user_id": "1",
                 "username": "admin",
                 "password": "加密后的密码",
-                "real_name": "管理员",
+                "real_name": "真实姓名",
                 "role_id": "1",
                 "role_name": "管理员",
             }

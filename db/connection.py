@@ -27,6 +27,7 @@ from .category_admin import CategoryAdminOperation
 from .project_admin import ProjectAdminOperation
 from .role import RoleTable
 from .assign import AssignOperation
+from .reimbursement import ReimbursementTable
 
 
 # 数据库操作类
@@ -37,6 +38,7 @@ class DatabaseOperation(
     ProjectAdminOperation,
     RoleTable,
     AssignOperation,
+    ReimbursementTable,
 ):
     _instance = None  # 单例模式
     error_mun = 0  # 错误次数
