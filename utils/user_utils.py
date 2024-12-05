@@ -56,3 +56,22 @@ async def user_select_all_from_username(username: str) -> dict:
         logger.error(e)
         logger.error(traceback.format_exc())
     return {}
+
+
+# 重置密码
+async def reset_password(username: str, password: str) -> bool:
+    """
+    重置密码
+    :param username: 用户名
+    :param password: 密码
+    :return: 重置密码成功返回True，重置密码失败返回False
+    """
+    try:
+        if await operate.user_update_password(
+            username, await password_utils.encrypt_password(password)
+        ):
+            return True
+    except Exception as e:
+        logger.error(e)
+        logger.error(traceback.format_exc())
+    return False

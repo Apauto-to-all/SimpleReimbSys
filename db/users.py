@@ -31,3 +31,19 @@ class UserTable:
                 logger.error(e)
                 logger.error(traceback.format_exc())
                 return {}
+
+    # 重置密码
+    async def user_update_password(self, username: str, password: str) -> bool:
+        async with self.pool.acquire() as conn:
+            try:
+                sql = """
+                UPDATE users
+                SET password = $2
+                WHERE username = $1
+                """
+                await conn.execute(sql, username, password)
+                return True
+            except Exception as e:
+                logger.error(e)
+                logger.error(traceback.format_exc())
+                return False

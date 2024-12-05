@@ -107,7 +107,7 @@
                             : '<span style="color: red;">未分配</span>';
                     }
                 },
-                { fixed: 'right', title: '操作', toolbar: '#actions', width: 200 }
+                { fixed: 'right', title: '操作', toolbar: '#actions', width: 300 }
             ]],
             title: '用户列表',
         });
@@ -165,7 +165,41 @@
                     area: ['50%', '50%']
                 });
             } else if (event === 'reset') {
-
+                // 弹出输入新密码的对话框
+                layer.prompt({
+                    formType: 1,
+                    title: '请输入新密码',
+                    area: ['300px', '200px']
+                }, function (user_reset_password, index) {
+                    // 调用重置密码的API
+                    fetch('/user/api/reset_password', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/x-www-form-urlencoded'
+                        },
+                        body: new URLSearchParams({
+                            username: data.username,
+                            password: user_reset_password,
+                            confirm_password: user_reset_password
+                        })
+                    }).then(response => {
+                        if (response.status === 200) {
+                            return response.json().then(res => {
+                                // 成功处理
+                                layer.msg("成功：" + res.message, { icon: 1 });
+                                layer.close(index); // 关闭弹窗
+                            });
+                        } else {
+                            return response.json().then(res => {
+                                // 显示错误信息
+                                layer.alert('失败：' + res.message, { icon: 2 });
+                            });
+                        }
+                    }).catch(error => {
+                        console.error('Error:', error);
+                        layer.alert('失败：' + res.message, { icon: 2 });
+                    });
+                });
             } else if (event === 'delete') {
                 // 删除用户
                 layer.confirm('确定删除用户：“' + data.username + '--' + data.real_name + '” ？', function (index) {
