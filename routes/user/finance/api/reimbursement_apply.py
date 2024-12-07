@@ -19,3 +19,28 @@ logger = logging.getLogger(__name__)
 
 router = APIRouter()
 templates = Jinja2Templates(directory="templates")
+
+
+# 报销申请api
+@router.post("/user/finance/api/reimbursement_apply")
+async def reimbursement_apply(
+    project_name: Optional[str] = Form(""),  # 项目名称
+    username: Optional[str] = Form(""),  # 用户名
+    amount: Optional[float] = Form(0.0),  # 报销金额
+    description: Optional[str] = Form(""),  # 报销描述
+    access_token: Optional[str] = Cookie(None),
+):
+    if not project_name or not username or not amount or not description:
+        return JSONResponse(content={"message": "参数不能为空"}, status_code=400)
+
+    user_dict = await user_utils.user_select_all(access_token)
+    if user_dict.get("role_name") != "报销人员":
+        return JSONResponse(content={"message": "无权限"}, status_code=403)
+
+    # 进行报销申请
+    if await reimbursement_utils.reimbursement_apply(
+        project_name, username, amount, description
+    ):
+        return JSONResponse(content={"message": "报销成功"}, status_code=200)
+
+    return JSONResponse(content={"message": "报销失败"}, status_code=400)

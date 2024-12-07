@@ -15,6 +15,7 @@ from utils import password_utils
 operate = DatabaseOperation()
 
 
+# 搜索报销细明
 async def search_reimbursement_info(
     page: int,
     limit: int,
@@ -92,3 +93,72 @@ async def search_reimbursement_info(
         logger.error(traceback.format_exc())
 
     return 0, []
+
+
+# 报销申请
+async def reimbursement_apply(
+    project_name: str, username: str, amount: float, description: str
+):
+    """
+    报销申请
+    :param project_name: 项目名称
+    :param username: 用户名
+    :param amount: 报销金额
+    :param description: 报销描述
+    :return: True or False
+    """
+    try:
+        # 进行报销申请
+        if await operate.reimbursement_apply(
+            project_name, username, amount, description
+        ):
+            return True
+    except Exception as e:
+        logger.error(e)
+        logger.error(traceback.format_exc())
+
+    return False
+
+
+# 报销审核
+async def reimbursement_audit(
+    reimbursement_id: int, username: str, status: str, comments: str
+):
+    """
+    报销审核
+    :param reimbursement_id: 报销ID
+    :param username: 财务人员用户名
+    :param status: 报销状态
+    :param comments: 审核意见
+    :return: True or False
+    """
+    try:
+        # 进行报销审核
+        if await operate.reimbursement_audit(
+            reimbursement_id, username, status, comments
+        ):
+            return True
+    except Exception as e:
+        logger.error(e)
+        logger.error(traceback.format_exc())
+
+    return False
+
+
+# 检查财务人员是否有权限审核报销项目
+async def check_finance_reimbursement(reimbursement_id: int, username: str):
+    """
+    检查财务人员是否有权限审核报销项目
+    :param username: 财务人员用户名
+    :param reimbursement_id: 报销ID
+    :return: True or False
+    """
+    try:
+        # 检查财务人员是否有权限审核报销项目
+        if await operate.check_finance_reimbursement(reimbursement_id, username):
+            return True
+    except Exception as e:
+        logger.error(e)
+        logger.error(traceback.format_exc())
+
+    return False
