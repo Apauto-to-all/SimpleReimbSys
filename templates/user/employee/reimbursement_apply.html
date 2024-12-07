@@ -1,9 +1,107 @@
 {% extends 'base.html' %}
 
-{% block title %}简易财务报销系统{% endblock %}
+{% block title %}报销人员 - 申请报销{% endblock %}
 
 {% block content %}
 
 <h1>申请报销</h1>
+
+<form class="layui-form layui-form-pane" action="/user/finance/api/reimbursement_apply" method="post"
+    style="padding: 20px;">
+    <!-- 项目名称 -->
+    <div class="layui-form-item">
+        <label class="layui-form-label">项目名称</label>
+        <div class="layui-input-block">
+            <select name="project_name" lay-verify="required" lay-search>
+                <option value="">请选择项目</option>
+                <!-- 项目列表将通过JS动态加载 -->
+            </select>
+        </div>
+    </div>
+
+    <!-- 报销金额 -->
+    <div class="layui-form-item">
+        <label class="layui-form-label">报销金额</label>
+        <div class="layui-input-block">
+            <input type="number" name="amount" autocomplete="off" placeholder="请输入报销金额 ￥" lay-verify="required|number"
+                class="layui-input">
+        </div>
+    </div>
+
+    <!-- 报销描述 -->
+    <div class="layui-form-item layui-form-text">
+        <label class="layui-form-label">报销描述</label>
+        <div class="layui-input-block">
+            <textarea placeholder="请输入报销描述" class="layui-textarea" name="description" lay-verify="required"></textarea>
+        </div>
+    </div>
+
+    <!-- 提交按钮 -->
+    <div class="layui-form-item">
+        <button class="layui-btn" lay-submit lay-filter="applyReimbursement">提交申请</button>
+        <button type="reset" class="layui-btn layui-btn-primary">重置</button>
+    </div>
+</form>
+
+<script>
+    layui.use(['form', 'layer'], function () {
+        var layer = layui.layer;
+        var form = layui.form;
+
+        // 页面加载时获取可报销的项目列表
+        fetch('/user/api/get_reimbursement_name_list')
+            .then(response => response.json())
+            .then(res => {
+                if (res.data) {
+                    const select = document.querySelector('select[name="project_name"]');
+                    res.data.forEach(project => {
+                        const option = document.createElement('option');
+                        option.value = project;
+                        option.textContent = project;
+                        select.appendChild(option);
+                    });
+                    form.render('select'); // 刷新选择框渲染
+                } else {
+                    layer.alert('暂无可报销的项目', { icon: 5 });
+                }
+            })
+            .catch(err => {
+                console.error(err);
+                layer.alert('无法获取可报销的项目列表，请稍后再试。', { icon: 5 });
+            });
+
+        // 监听提交
+        form.on('submit(applyReimbursement)', function (data) {
+            // 加载动画
+            var loading = layer.load(2);
+            fetch('/user/finance/api/reimbursement_apply', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                },
+                body: new URLSearchParams(data.field)
+            })
+                .then(response => {
+                    layer.close(loading);
+                    if (response.status == 200) {
+                        return response.json().then(res => {
+                            layer.msg(res.message, { icon: 1 });
+                        });
+                    } else {
+                        return response.json().then(res => {
+                            layer.alert(res.message, { icon: 2 });
+                        });
+                    }
+                }).catch(err => {
+                    layer.close(loading);
+                    console.error(err);
+                    layer.alert('请求失败，请稍后再试。', {
+                        icon: 5
+                    });
+                });
+            return false; // 阻止表单默认提交
+        });
+    });
+</script>
 
 {% endblock %}
