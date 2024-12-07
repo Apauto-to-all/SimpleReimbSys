@@ -6,7 +6,7 @@
 
 <h1>申请报销</h1>
 
-<form class="layui-form layui-form-pane" action="/user/finance/api/reimbursement_apply" method="post"
+<form class="layui-form layui-form-pane" action="/user/employee/api/reimbursement_apply" method="post"
     style="padding: 20px;">
     <!-- 项目名称 -->
     <div class="layui-form-item">
@@ -74,7 +74,7 @@
         form.on('submit(applyReimbursement)', function (data) {
             // 加载动画
             var loading = layer.load(2);
-            fetch('/user/finance/api/reimbursement_apply', {
+            fetch('/user/employee/api/reimbursement_apply', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/x-www-form-urlencoded'

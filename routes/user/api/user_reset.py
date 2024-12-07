@@ -68,7 +68,7 @@ async def reimbursement_name(
 ):
     user_dict = await user_utils.user_select_all(access_token)
     if user_dict.get("role_name") == "管理员":
-        return JSONResponse(content={"message": "管理员禁止报销"}, status_code=400)
+        return JSONResponse(content={"message": "管理员无法访问"}, status_code=400)
 
     name_list = await reimbursement_utils.get_reimbursement_name_list(
         user_dict.get("username"), user_dict.get("role_name")
