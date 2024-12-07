@@ -22,7 +22,7 @@ templates = Jinja2Templates(directory="templates")
 
 
 # 审核报销api
-@router.post("/user/finance/api/audit")
+@router.post("/user/finance/api/reimbursement_audit")
 async def audit(
     reimbursement_id: Optional[int] = Form(0),  # 报销ID
     status: Optional[str] = Form(""),  # 审核状态，已通过，已拒绝

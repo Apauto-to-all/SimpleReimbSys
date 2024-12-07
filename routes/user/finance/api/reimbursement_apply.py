@@ -25,12 +25,11 @@ templates = Jinja2Templates(directory="templates")
 @router.post("/user/finance/api/reimbursement_apply")
 async def reimbursement_apply(
     project_name: Optional[str] = Form(""),  # 项目名称
-    username: Optional[str] = Form(""),  # 用户名
     amount: Optional[float] = Form(0.0),  # 报销金额
     description: Optional[str] = Form(""),  # 报销描述
     access_token: Optional[str] = Cookie(None),
 ):
-    if not project_name or not username or not amount or not description:
+    if not project_name or not amount or not description:
         return JSONResponse(content={"message": "参数不能为空"}, status_code=400)
 
     user_dict = await user_utils.user_select_all(access_token)
@@ -39,7 +38,7 @@ async def reimbursement_apply(
 
     # 进行报销申请
     if await reimbursement_utils.reimbursement_apply(
-        project_name, username, amount, description
+        project_name, user_dict.get("username"), amount, description
     ):
         return JSONResponse(content={"message": "报销成功"}, status_code=200)
 

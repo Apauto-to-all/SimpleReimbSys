@@ -145,20 +145,19 @@ async def reimbursement_audit(
     return False
 
 
-# 检查财务人员是否有权限审核报销项目
-async def check_finance_reimbursement(reimbursement_id: int, username: str):
+# 获取财务人员或报销人员的可报销项目或类别名称列表
+async def get_reimbursement_name_list(username: str, role_name: str):
     """
-    检查财务人员是否有权限审核报销项目
-    :param username: 财务人员用户名
-    :param reimbursement_id: 报销ID
-    :return: True or False
+    获取财务人员或报销人员的可报销项目或类别名称列表
+    :param username: 用户名
+    :param role_name: 角色名称
+    :return: 项目或类别名称列表
     """
     try:
-        # 检查财务人员是否有权限审核报销项目
-        if await operate.check_finance_reimbursement(reimbursement_id, username):
-            return True
+        name_list = await operate.user_allocation_name_list(username, role_name)
+        return name_list
     except Exception as e:
         logger.error(e)
         logger.error(traceback.format_exc())
 
-    return False
+    return []

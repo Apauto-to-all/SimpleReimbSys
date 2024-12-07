@@ -15,7 +15,7 @@ from typing import Optional  # 功能：用于声明可选参数
 
 import logging
 
-from utils import account_utils, login_utils, user_utils
+from utils import account_utils, login_utils, user_utils, reimbursement_utils
 
 logger = logging.getLogger(__name__)
 
@@ -59,3 +59,19 @@ async def reset_password(
         return JSONResponse(content={"message": "修改密码成功"}, status_code=200)
 
     return JSONResponse(content={"message": "修改密码失败"}, status_code=400)
+
+
+# 获取用户所有可报销的项目名称api
+@router.get("/user/api/get_reimbursement_name_list")
+async def reimbursement_name(
+    access_token: Optional[str] = Cookie(None),
+):
+    user_dict = await user_utils.user_select_all(access_token)
+    if user_dict.get("role_name") == "管理员":
+        return JSONResponse(content={"message": "管理员禁止报销"}, status_code=400)
+
+    name_list = await reimbursement_utils.get_reimbursement_name_list(
+        user_dict.get("username"), user_dict.get("role_name")
+    )
+
+    return JSONResponse(content={"data": name_list}, status_code=200)
