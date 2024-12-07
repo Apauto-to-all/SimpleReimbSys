@@ -6,6 +6,12 @@
 
 <h1>显示报销明细</h1>
 
+<style>
+    .layui-form-label {
+        width: 120px;
+    }
+</style>
+
 <!-- 搜索表单 -->
 <form class="layui-form" lay-filter="searchForm" id="searchForm" style="margin-bottom: 20px;">
     <div class="layui-form-item">
@@ -104,11 +110,27 @@
             cols: [[
                 { field: 'reimbursement_id', title: 'ID', width: 80, sort: true },
                 { field: 'employee_username', title: '报销人员用户名', width: 130 },
-                { field: 'finance_username', title: '财务人员用户名', width: 130 },
-                { field: 'category_name', title: '类别名称', width: 120 },
-                { field: 'project_name', title: '项目名称', width: 150 },
+                {
+                    field: 'finance_username', title: '财务人员用户名', width: 130,
+                    templet: function (d) {
+                        return d.finance_username || '<span style="color: grey;">未审核</span>';;
+                    }
+                },
+                { field: 'category_name', title: '类别名称', width: 200 },
+                { field: 'project_name', title: '项目名称', width: 200 },
                 { field: 'amount', title: '报销金额', width: 120, sort: true },
-                { field: 'status', title: '报销状态', width: 100 },
+                {
+                    field: 'status', title: '报销状态', width: 100,
+                    templet: function (d) {
+                        if (d.status === '已通过') {
+                            return '<span style="color: green;">' + d.status + '</span>';
+                        } else if (d.status === '已拒绝') {
+                            return '<span style="color: red;">' + d.status + '</span>';
+                        } else {
+                            return '<span style="color: grey;">' + d.status + '</span>';
+                        }
+                    }
+                },
                 {
                     field: 'submit_date', title: '提交时间', width: 160, templet: function (d) {
                         return new Date(d.submit_date * 1000).toLocaleString();
@@ -116,10 +138,10 @@
                 },
                 {
                     field: 'approve_date', title: '审核时间', width: 160, templet: function (d) {
-                        return d.approve_date ? new Date(d.approve_date * 1000).toLocaleString() : '未审核';
+                        return d.approve_date ? new Date(d.approve_date * 1000).toLocaleString() : '<span style="color: grey;">未审核</span>';;
                     }
                 },
-                { fixed: 'right', title: '操作', toolbar: '#operationTpl', width: 80 }
+                { fixed: 'right', title: '操作', toolbar: '#operationTpl' }
             ]],
         });
 
@@ -153,7 +175,7 @@
                 layer.open({
                     type: 1,
                     title: '报销详情',
-                    area: ['600px', '500px'],
+                    area: ['50%', '50%'],
                     content: `
                     <div style="padding: 20px;">
                         <p><strong>报销ID：</strong>${data.reimbursement_id}</p>
