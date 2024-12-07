@@ -41,8 +41,8 @@ class ReimbursementTable:
                     LEFT JOIN users AS fu ON r.finance_id = fu.user_id
                     WHERE eu.username ILIKE '%' || $1 || '%'
                     AND eu.real_name ILIKE '%' || $2 || '%'
-                    AND fu.username ILIKE '%' || $3 || '%'
-                    AND fu.real_name ILIKE '%' || $4 || '%'
+                    AND COALESCE(fu.username, '') ILIKE '%' || $3 || '%'
+                    AND COALESCE(fu.real_name, '') ILIKE '%' || $4 || '%'
                     AND c.category_name ILIKE '%' || $5 || '%'
                     AND p.project_name ILIKE '%' || $6 || '%'
                     AND r.status ILIKE '%' || $7 || '%'
@@ -67,8 +67,8 @@ class ReimbursementTable:
                     LEFT JOIN users AS fu ON r.finance_id = fu.user_id
                     WHERE eu.username ILIKE '%' || $1 || '%'
                     AND eu.real_name ILIKE '%' || $2 || '%'
-                    AND fu.username ILIKE '%' || $3 || '%'
-                    AND fu.real_name ILIKE '%' || $4 || '%'
+                    AND COALESCE(fu.username, '') ILIKE '%' || $3 || '%'
+                    AND COALESCE(fu.real_name, '') ILIKE '%' || $4 || '%'
                     AND c.category_name ILIKE '%' || $5 || '%'
                     AND p.project_name ILIKE '%' || $6 || '%'
                     AND r.status ILIKE '%' || $7 || '%'
@@ -145,8 +145,8 @@ class ReimbursementTable:
                     LEFT JOIN categories AS c ON p.category_id = c.category_id
                     LEFT JOIN users AS fu ON r.finance_id = fu.user_id
                     WHERE r.employee_id = (SELECT user_id FROM users WHERE username = $1)
-                    AND fu.username ILIKE '%' || $2 || '%'
-                    AND fu.real_name ILIKE '%' || $3 || '%'
+                    AND COALESCE(fu.username, '') ILIKE '%' || $2 || '%'
+                    AND COALESCE(fu.real_name, '') ILIKE '%' || $3 || '%'
                     AND c.category_name ILIKE '%' || $4 || '%'
                     AND p.project_name ILIKE '%' || $5 || '%'
                     AND r.status ILIKE '%' || $6 || '%'
@@ -170,8 +170,8 @@ class ReimbursementTable:
                     LEFT JOIN users AS eu ON r.employee_id = eu.user_id
                     LEFT JOIN users AS fu ON r.finance_id = fu.user_id
                     WHERE r.employee_id = (SELECT user_id FROM users WHERE username = $1)
-                    AND fu.username ILIKE '%' || $2 || '%'
-                    AND fu.real_name ILIKE '%' || $3 || '%'
+                    AND COALESCE(fu.username, '') ILIKE '%' || $2 || '%'
+                    AND COALESCE(fu.real_name, '') ILIKE '%' || $3 || '%'
                     AND c.category_name ILIKE '%' || $4 || '%'
                     AND p.project_name ILIKE '%' || $5 || '%'
                     AND r.status ILIKE '%' || $6 || '%'
