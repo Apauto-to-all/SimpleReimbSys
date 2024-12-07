@@ -32,7 +32,7 @@ async def reimbursement_search(
     finance_real_name: Optional[str] = Query(""),  # 财务人员真实姓名
     category_name: Optional[str] = Query(""),  # 类别名称
     project_name: Optional[str] = Query(""),  # 项目名称
-    status: Optional[str] = Query(""),  # 报销状态，待审核，已审核，已拒绝
+    status: Optional[str] = Query(""),  # 报销状态，待审核，已通过，已拒绝
     access_token: Optional[str] = Cookie(None),
 ):
     user_dict = await user_utils.user_select_all(access_token)

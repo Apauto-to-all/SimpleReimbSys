@@ -24,7 +24,7 @@ class ReimbursementTable:
         finance_real_name: str,  # 财务人员真实姓名
         category_name: str,  # 类别名称
         project_name: str,  # 项目名称
-        status: str,  # 报销状态，待审核，已审核，已拒绝
+        status: str,  # 报销状态，待审核，已通过，已拒绝
         role_name: str,  # 角色名称
     ) -> tuple:
         async with self.pool.acquire() as conn:
