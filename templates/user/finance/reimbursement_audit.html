@@ -1,9 +1,142 @@
 {% extends 'base.html' %}
 
-{% block title %}简易财务报销系统{% endblock %}
+{% block title %}财务人员 - 审核报销{% endblock %}
 
 {% block content %}
 
 <h1>审核报销</h1>
+
+<!-- 表格容器 -->
+<table id="reimbursementTable" lay-filter="reimbursementTable"></table>
+
+<!-- 操作栏模板 -->
+<script type="text/html" id="operationTpl">
+    <a class="layui-btn layui-btn-normal layui-btn-sm" lay-event="audit">审核</a>
+</script>
+
+<script>
+    layui.use(['table', 'form', 'layer'], function () {
+        var table = layui.table;
+        var form = layui.form;
+        var layer = layui.layer;
+
+        // 初始化表格
+        table.render({
+            elem: '#reimbursementTable',
+            url: '/user/finance/api/reimbursement_list',
+            method: 'GET',
+            page: true,
+            cols: [[
+                { field: 'reimbursement_id', title: 'ID', width: 80, sort: true },
+                { field: 'employee_username', title: '报销人员用户名', width: 130 },
+                { field: 'employee_real_name', title: '报销人员姓名', width: 130 },
+                { field: 'category_name', title: '类别名称', width: 120 },
+                { field: 'project_name', title: '项目名称', width: 150 },
+                { field: 'amount', title: '报销金额', width: 100 },
+                { field: 'description', title: '报销描述', width: 200 },
+                {
+                    field: 'submit_date', title: '提交时间', width: 160, templet: function (d) {
+                        return new Date(d.submit_date * 1000).toLocaleString();
+                    }
+                },
+                { fixed: 'right', title: '操作', toolbar: '#operationTpl', width: 100 }
+            ]]
+        });
+
+        // 监听表格工具栏
+        table.on('tool(reimbursementTable)', function (obj) {
+            var data = obj.data;
+
+            if (obj.event === 'audit') {
+                // 打开审核弹窗
+                layer.open({
+                    type: 1,
+                    title: '审核报销',
+                    area: ['80%', '80%'],
+                    shade: 0.6, // 遮罩透明度
+                    shadeClose: true, // 点击遮罩区域，关闭弹层
+                    maxmin: true, // 允许全屏最小化
+                    anim: 0, // 0-6 的动画形式，-1 不开启
+                    content: `
+                    <div style="padding: 20px; line-height: 2">
+                        <div><strong>报销ID：</strong>${data.reimbursement_id}</div>
+                        <div><strong>报销人员：</strong>${data.employee_real_name} (${data.employee_username})</div>
+                        <div><strong>类别名称：</strong>${data.category_name}</div>
+                        <div><strong>类别是否有效：</strong>${data.category_is_deleted ? '否' : '是'}</div>
+                        <div><strong>项目名称：</strong>${data.project_name}</div>
+                        <div><strong>项目是否有效：</strong>${data.project_is_deleted ? '否' : '是'}</div>
+                        <div><strong>报销金额：</strong>${data.amount}</div>
+                        <div><strong>报销描述：</strong>${data.description}</div>
+                        <div><strong>提交时间：</strong>${new Date(data.submit_date * 1000).toLocaleString()}</div>
+                    </div>
+                    <form class="layui-form" lay-filter="auditForm" style="padding:20px;">
+                        <input type="hidden" name="reimbursement_id" value="${data.reimbursement_id}">
+                        <div class="layui-form-item">
+                            <label class="layui-form-label">审核状态</label>
+                            <div class="layui-input-block">
+                                <select name="status" lay-verify="required">
+                                    <option value="">请选择</option>
+                                    <option value="已通过">已通过</option>
+                                    <option value="已拒绝">已拒绝</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="layui-form-item layui-form-text">
+                            <label class="layui-form-label">审核意见</label>
+                            <div class="layui-input-block">
+                                <textarea name="comment" placeholder="请输入审核意见" class="layui-textarea" lay-verify="required"></textarea>
+                            </div>
+                        </div>
+                    </form>`,
+                    success: function (layero, index) {
+                        // 渲染表单
+                        form.render(null, 'auditForm');
+                        // 初始化表单数据
+                        form.val('auditForm', {
+                            "reimbursement_id": data.reimbursement_id
+                        });
+                    },
+                    btn: ['提交', '取消'],
+                    yes: function (index, layero) {
+                        // 获取表单数据
+                        var formData = form.val('auditForm');
+                        // 校验
+                        if (!formData.status) {
+                            layer.msg('请选择审核状态', { icon: 5 });
+                            return;
+                        }
+                        if (!formData.comment) {
+                            layer.msg('请输入审核意见', { icon: 5 });
+                            return;
+                        }
+                        // 提交审核
+                        fetch('/user/finance/api/reimbursement_audit', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/x-www-form-urlencoded'
+                            },
+                            body: new URLSearchParams(formData)
+                        }).then(response => {
+                            if (response.status === 200) {
+                                return response.json().then(res => {
+                                    layer.msg(res.message, { icon: 1 });
+                                    table.reload('reimbursementTable');
+                                    layer.close(index);
+                                });
+                            } else {
+                                return response.json().then(res => {
+                                    layer.alert(res.message, { icon: 2 });
+                                });
+                            }
+                        }).catch(error => {
+                            console.error(error);
+                            layer.alert('审核失败，请稍后再试', { icon: 5 });
+                        });
+                    },
+                });
+            }
+        });
+    });
+</script>
 
 {% endblock %}

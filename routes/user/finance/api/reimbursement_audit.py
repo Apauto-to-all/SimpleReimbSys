@@ -46,3 +46,24 @@ async def audit(
         return JSONResponse(content={"message": "审核成功"}, status_code=200)
 
     return JSONResponse(content={"message": "审核失败"}, status_code=400)
+
+
+# 获取待审核报销列表api
+@router.get("/user/finance/api/reimbursement_list")
+async def reimbursement_list(
+    page: Optional[int] = Query(1),  # 页码
+    limit: Optional[int] = Query(10),  # 每页数量
+    access_token: Optional[str] = Cookie(None),
+):
+    user_dict = await user_utils.user_select_all(access_token)
+    if user_dict.get("role_name") != "财务人员":
+        return JSONResponse(content={"message": "无权限"}, status_code=403)
+
+    count, list_data = await reimbursement_utils.search_finance_reimbursement_list(
+        page, limit, user_dict.get("username"), user_dict.get("role_name")
+    )
+
+    return JSONResponse(
+        content={"code": 0, "msg": "", "count": count, "data": list_data},
+        status_code=200,
+    )

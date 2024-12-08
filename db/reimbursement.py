@@ -13,6 +13,7 @@ logger = logging.getLogger(__name__)
 
 
 class ReimbursementTable:
+    # 搜索报销信息
     async def reimbursement_search(
         self,
         page: int,
@@ -197,6 +198,78 @@ class ReimbursementTable:
                     return 0, []
 
                 records = await conn.fetch(sql, *params)
+                # 将记录转换为列表
+                data = [dict(record) for record in records]
+                return count, data
+            except Exception as e:
+                logger.error(e)
+                logger.error(traceback.format_exc())
+                return 0, []
+
+    # 搜索财务人员负责的报销信息
+    async def finance_reimbursement_search(
+        self,
+        page: int,
+        limit: int,
+        category_name_list: list,  # 类别名称列表
+    ):
+        async with self.pool.acquire() as conn:
+            try:
+                offset = (page - 1) * limit  # 计算偏移量
+                # 查询类别对应的项目ID
+                project_ids = await conn.fetch(
+                    """
+                    SELECT p.project_id
+                    FROM projects AS p
+                    JOIN categories AS c ON p.category_id = c.category_id
+                    WHERE c.category_name = ANY($1)
+                    """,
+                    category_name_list,
+                )
+                project_ids = [record["project_id"] for record in project_ids]
+                # 查询报销信息
+                count = await conn.fetchval(
+                    """
+                    SELECT COUNT(*) 
+                    FROM reimbursement_applications AS r
+                    LEFT JOIN projects AS p ON r.project_id = p.project_id
+                    LEFT JOIN categories AS c ON p.category_id = c.category_id
+                    LEFT JOIN users AS eu ON r.employee_id = eu.user_id
+                    WHERE r.project_id = ANY($1)
+                    AND r.status = '待审核'
+                    AND p.is_deleted = false AND c.is_deleted = false
+                    """,
+                    project_ids,
+                )
+                if not count:
+                    return 0, []
+
+                records = await conn.fetch(
+                    """
+                    SELECT
+                        r.*,
+                        p.project_name,
+                        p.project_source,
+                        p.is_deleted AS project_is_deleted,
+                        c.category_id,
+                        c.category_name,
+                        c.is_deleted AS category_is_deleted,
+                        eu.username AS employee_username,
+                        eu.real_name AS employee_real_name
+                    FROM reimbursement_applications AS r
+                    LEFT JOIN projects AS p ON r.project_id = p.project_id
+                    LEFT JOIN categories AS c ON p.category_id = c.category_id
+                    LEFT JOIN users AS eu ON r.employee_id = eu.user_id
+                    WHERE r.project_id = ANY($1)
+                    AND r.status = '待审核'
+                    AND p.is_deleted = false AND c.is_deleted = false
+                    ORDER BY submit_date
+                    LIMIT $2 OFFSET $3
+                    """,
+                    project_ids,
+                    limit,
+                    offset,
+                )
                 # 将记录转换为列表
                 data = [dict(record) for record in records]
                 return count, data

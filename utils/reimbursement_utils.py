@@ -17,38 +17,18 @@ operate = DatabaseOperation()
 
 # 搜索报销细明
 async def search_reimbursement_info(
-    page: int,
-    limit: int,
-    use_username: str,
-    employee_username: str,
-    employee_real_name: str,
-    finance_username: str,
-    finance_real_name: str,
-    category_name: str,
-    project_name: str,
-    status: str,
-    role_name: str,
-):
-    """
-    搜索报销细明信息
-    :param page: 页码
-    :param limit: 每页数量
-
-    :param use_username: 当前登入的用户名
-
-    :param employee_username: 报销人员用户名
-    :param employee_real_name: 报销人员真实姓名
-
-    :param finance_username: 财务人员用户名
-    :param finance_real_name: 财务人员真实姓名
-
-    :param category_name: 类别名称
-    :param project_name: 项目名称
-    :param status: 报销状态
-    :param role_name: 角色名称
-
-    :return: 总数，列表数据
-    """
+    page: int,  # 页码
+    limit: int,  # 每页数量
+    use_username: str,  # 使用用户名
+    employee_username: str,  # 报销人员用户名
+    employee_real_name: str,  # 报销人员真实姓名
+    finance_username: str,  # 财务人员用户名
+    finance_real_name: str,  # 财务人员真实姓名
+    category_name: str,  # 类别名称
+    project_name: str,  # 项目名称
+    status: str,  # 报销状态
+    role_name: str,  # 角色名称
+) -> tuple:
     try:
         [
             {
@@ -161,3 +141,22 @@ async def get_reimbursement_name_list(username: str, role_name: str):
         logger.error(traceback.format_exc())
 
     return []
+
+
+# 搜索财务人员需要审核的报销列表
+async def search_finance_reimbursement_list(
+    page: int, limit: int, username: str, role_name: str
+) -> tuple:
+    try:
+        category_name_list = await operate.user_allocation_name_list(
+            username, role_name
+        )
+        count, list_data = await operate.finance_reimbursement_search(
+            page, limit, category_name_list
+        )
+        return count, list_data
+    except Exception as e:
+        logger.error(e)
+        logger.error(traceback.format_exc())
+
+    return 0, []
