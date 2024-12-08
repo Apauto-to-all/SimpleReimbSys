@@ -175,20 +175,26 @@
                 layer.open({
                     type: 1,
                     title: '报销详情',
-                    area: ['50%', '50%'],
+                    area: ['60%', '60%'],
+                    shade: 0.6, // 遮罩透明度
+                    shadeClose: true, // 点击遮罩区域，关闭弹层
+                    maxmin: true, // 允许全屏最小化
+                    anim: 0, // 0-6 的动画形式，-1 不开启
                     content: `
-                    <div style="padding: 20px;">
-                        <p><strong>报销ID：</strong>${data.reimbursement_id}</p>
-                        <p><strong>报销人员：</strong>${data.employee_real_name} (${data.employee_username})</p>
-                        <p><strong>财务人员：</strong>${data.finance_real_name || '未审核'} (${data.finance_username || '-'})</p>
-                        <p><strong>类别名称：</strong>${data.category_name}</p>
-                        <p><strong>项目名称：</strong>${data.project_name}</p>
-                        <p><strong>报销金额：</strong>${data.amount}</p>
-                        <p><strong>报销描述：</strong>${data.description}</p>
-                        <p><strong>提交时间：</strong>${new Date(data.submit_date * 1000).toLocaleString()}</p>
-                        <p><strong>审核时间：</strong>${data.approve_date ? new Date(data.approve_date * 1000).toLocaleString() : '未审核'}</p>
-                        <p><strong>审核意见：</strong>${data.comments || '无'}</p>
-                        <p><strong>报销状态：</strong>${data.status}</p>
+                    <div style="padding: 20px; line-height: 2;">
+                        <div><strong>报销ID：</strong>${data.reimbursement_id}</div>
+                        <div><strong>报销人员：</strong>${data.employee_real_name} (${data.employee_username})</div>
+                        <div><strong>财务人员：</strong>${data.finance_real_name || '未审核'} (${data.finance_username || '-'})</div>
+                        <div><strong>类别名称：</strong>${data.category_name}</div>
+                        <div><strong>类别是否有效：</strong>${data.category_is_deleted ? '否' : '是'}</div>
+                        <div><strong>项目名称：</strong>${data.project_name}</div>
+                        <div><strong>项目是否有效：</strong>${data.project_is_deleted ? '否' : '是'}</div>
+                        <div><strong>报销金额：</strong>${data.amount}</div>
+                        <div><strong>报销描述：</strong>${data.description}</div>
+                        <div><strong>提交时间：</strong>${new Date(data.submit_date * 1000).toLocaleString()}</div>
+                        <div><strong>审核时间：</strong>${data.approve_date ? new Date(data.approve_date * 1000).toLocaleString() : '未审核'}</div>
+                        <div><strong>审核意见：</strong>${data.comments || '无'}</div>
+                        <div><strong>报销状态：</strong>${data.status}</div>
                     </div>
                 `
                 });

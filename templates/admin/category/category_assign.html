@@ -118,6 +118,10 @@
                     type: 1,
                     title: '分配财务人员',
                     area: ['60%', '60%'],
+                    shade: 0.6, // 遮罩透明度
+                    shadeClose: true, // 点击遮罩区域，关闭弹层
+                    maxmin: true, // 允许全屏最小化
+                    anim: 0, // 0-6 的动画形式，-1 不开启
                     content: `<div style="padding:20px;">
                         <form class="layui-form">
                             <div class="layui-form-item">
@@ -239,6 +243,10 @@
                     type: 1,
                     title: '删除财务人员',
                     area: ['60%', '60%'],
+                    shade: 0.6, // 遮罩透明度
+                    shadeClose: true, // 点击遮罩区域，关闭弹层
+                    maxmin: true, // 允许全屏最小化
+                    anim: 0, // 0-6 的动画形式，-1 不开启
                     content: `<div style="padding:20px;">
                         <table id="financeTable" lay-filter="financeTable"></table>
                     </div>`,

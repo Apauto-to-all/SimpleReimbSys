@@ -149,16 +149,20 @@
                 layer.open({
                     type: 1,
                     title: '用户详情',
+                    area: ['60%', '60%'],
+                    shade: 0.6, // 遮罩透明度
+                    shadeClose: true, // 点击遮罩区域，关闭弹层
+                    maxmin: true, // 允许全屏最小化
+                    anim: 0, // 0-6 的动画形式，-1 不开启
                     content: `
-                        <div style="padding: 20px; text-align: left;">
-                            <p><strong>用户ID:</strong> ${data.user_id}</p>
-                            <p><strong>用户名:</strong> ${data.username}</p>
-                            <p><strong>真实姓名:</strong> ${data.real_name}</p>
-                            <p><strong>角色:</strong> ${data.role_name}</p>
-                            <p><strong>分配项目/类别:</strong> ${data.allocation_name_list.length > 0 ? data.allocation_name_list.join(', ') : '未分配'}</p>
-                        </div>
+                    <div style="padding: 20px; line-height: 2">
+                        <div><strong>用户ID:</strong> ${data.user_id}</div>
+                        <div><strong>用户名:</strong> ${data.username}</div>
+                        <div><strong>真实姓名:</strong> ${data.real_name}</div>
+                        <div><strong>角色:</strong> ${data.role_name}</div>
+                        <div><strong>分配项目/类别:</strong> ${data.allocation_name_list.length > 0 ? data.allocation_name_list.join(', ') : '未分配'}</div>
+                    </div>
                     `,
-                    area: ['50%', '50%']
                 });
             } else if (event === 'reset') {
                 // 弹出输入新密码的对话框
