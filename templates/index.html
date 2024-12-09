@@ -4,7 +4,120 @@
 
 {% block content %}
 
-<h1>主页说明</h1>
-<p>这是一个简易的财务报销系统</p>
+<div class="layui-row layui-col-space15" style="margin-top: 20px;">
+    <div class="layui-col-md12">
+        <div class="layui-card">
+            <div class="layui-card-header">
+                <h1>欢迎使用简易财务报销系统</h1>
+            </div>
+            <div class="layui-card-body">
+                <p>本系统旨在简化财务报销流程，提高报销效率。系统主要分为以下三个角色，每个角色都有相应的功能：</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- 管理员功能介绍 -->
+    <div class="layui-col-md4">
+        <div class="layui-card">
+            <div class="layui-card-header">
+                <i class="layui-icon layui-icon-user"></i> 管理员功能介绍
+            </div>
+            <div class="layui-card-body">
+                <ul class="layui-timeline">
+                    <li class="layui-timeline-item">
+                        <i class="layui-icon layui-timeline-axis"></i>
+                        <div class="layui-timeline-content layui-text">
+                            <h3 class="layui-timeline-title">用户管理</h3>
+                            <p>创建、删除报销人员账户和财务人员账户、查询用户信息、重置用户密码</p>
+                        </div>
+                    </li>
+                    <li class="layui-timeline-item">
+                        <i class="layui-icon layui-timeline-axis"></i>
+                        <div class="layui-timeline-content layui-text">
+                            <h3 class="layui-timeline-title">项目类别管理</h3>
+                            <p>创建、删除、查询项目类别，将报销项目类别分配给财务人员</p>
+                        </div>
+                    </li>
+                    <li class="layui-timeline-item">
+                        <i class="layui-icon layui-timeline-axis"></i>
+                        <div class="layui-timeline-content layui-text">
+                            <h3 class="layui-timeline-title">项目管理</h3>
+                            <p>创建、删除、查询项目，将报销项目分配给报销人员</p>
+                        </div>
+                    </li>
+                    <li class="layui-timeline-item">
+                        <i class="layui-icon layui-timeline-axis"></i>
+                        <div class="layui-timeline-content layui-text">
+                            <h3 class="layui-timeline-title">数据查看</h3>
+                            <p>查看所有报销申请及其详细信息，按条件筛选报销记录</p>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- 财务人员功能介绍 -->
+    <div class="layui-col-md4">
+        <div class="layui-card">
+            <div class="layui-card-header">
+                <i class="layui-icon layui-icon-read"></i> 财务人员功能介绍
+            </div>
+            <div class="layui-card-body">
+                <ul class="layui-timeline">
+                    <li class="layui-timeline-item">
+                        <i class="layui-icon layui-timeline-axis"></i>
+                        <div class="layui-timeline-content layui-text">
+                            <h3 class="layui-timeline-title">审核报销申请</h3>
+                            <p>查看待审核的报销申请，审核报销申请：提交审核结果和意见</p>
+                        </div>
+                    </li>
+                    <li class="layui-timeline-item">
+                        <i class="layui-icon layui-timeline-axis"></i>
+                        <div class="layui-timeline-content layui-text">
+                            <h3 class="layui-timeline-title">数据查看</h3>
+                            <p>查看与自己相关的报销数据；按条件筛选报销记录</p>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- 报销人员功能介绍 -->
+    <div class="layui-col-md4">
+        <div class="layui-card">
+            <div class="layui-card-header">
+                <i class="layui-icon layui-icon-form"></i> 报销人员功能介绍
+            </div>
+            <div class="layui-card-body">
+                <ul class="layui-timeline">
+                    <li class="layui-timeline-item">
+                        <i class="layui-icon layui-timeline-axis"></i>
+                        <div class="layui-timeline-content layui-text">
+                            <h3 class="layui-timeline-title">报销申请</h3>
+                            <p>对可报销的项目进行申请</p>
+                        </div>
+                    </li>
+                    <li class="layui-timeline-item">
+                        <i class="layui-icon layui-timeline-axis"></i>
+                        <div class="layui-timeline-content layui-text">
+                            <h3 class="layui-timeline-title">数据查看</h3>
+                            <p>查看与自己相关的报销数据；按条件筛选报销记录</p>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <div class="layui-col-md12" style="margin-top: 20px;">
+        <div class="layui-card">
+            <div class="layui-card-body">
+                <p>如有任何问题，请联系系统管理员。</p>
+            </div>
+        </div>
+    </div>
+</div>
 
 {% endblock %}
