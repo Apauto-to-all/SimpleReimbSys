@@ -119,43 +119,41 @@
 </body>
 
 <script>
-    layui.use(function () {
-        var element = layui.element;
-        var layer = layui.layer;
-        var form = layui.form;
-
-        document.addEventListener('DOMContentLoaded', function () {
-            // 获取当前路径
-            var currentPath = window.location.pathname;
-            // 设置高亮
-            function setActiveNav(navClass) {
-                var navList = document.querySelector(navClass).getElementsByTagName('li');
-                for (var i = 0; i < navList.length; i++) {
-                    var anchor = navList[i].getElementsByTagName('a')[0];
-                    var href = anchor.getAttribute('href');
-                    // 使用 startsWith 支持子路径高亮
-                    if (currentPath === href || currentPath.startsWith(href + '/')) {
-                        navList[i].classList.add('layui-this');
+    document.addEventListener('DOMContentLoaded', function () {
+        // 获取当前路径
+        var currentPath = window.location.pathname;
+        // 设置高亮
+        function setActiveNav(navClass) {
+            var navList = document.querySelector(navClass).getElementsByTagName('li');
+            for (var i = 0; i < navList.length; i++) {
+                var anchor = navList[i].getElementsByTagName('a')[0];
+                var href = anchor.getAttribute('href');
+                // 使用 startsWith 支持子路径高亮
+                if (currentPath === href || currentPath.startsWith(href + '/')) {
+                    navList[i].classList.add('layui-this');
+                    return;
+                }
+                // 查询子菜单
+                var subNavList = navList[i].querySelectorAll('dd');
+                for (var j = 0; j < subNavList.length; j++) {
+                    var subAnchor = subNavList[j].getElementsByTagName('a')[0];
+                    var subHref = subAnchor.getAttribute('href');
+                    if (currentPath === subHref || currentPath.startsWith(subHref + '/')) {
+                        navList[i].classList.add('layui-nav-itemed');
+                        subNavList[j].classList.add('layui-this');
                         return;
-                    }
-                    // 查询子菜单
-                    var subNavList = navList[i].querySelectorAll('dd');
-                    for (var j = 0; j < subNavList.length; j++) {
-                        var subAnchor = subNavList[j].getElementsByTagName('a')[0];
-                        var subHref = subAnchor.getAttribute('href');
-                        if (currentPath === subHref || currentPath.startsWith(subHref + '/')) {
-                            navList[i].classList.add('layui-nav-itemed');
-                            subNavList[j].classList.add('layui-this');
-                            return;
-                        }
                     }
                 }
             }
-            // 设置顶部导航高亮，选择具有 'layui-layout-left' 类的导航
-            setActiveNav('.layui-layout-left');
-            // 设置侧边栏导航高亮，选择具有 'layui-nav-tree' 类的导航
-            setActiveNav('.layui-nav-tree');
-        });
+        }
+        // 设置顶部导航高亮，选择具有 'layui-layout-left' 类的导航
+        setActiveNav('.layui-layout-left');
+        // 设置侧边栏导航高亮，选择具有 'layui-nav-tree' 类的导航
+        setActiveNav('.layui-nav-tree');
+    });
+    layui.use(function () {
+        var layer = layui.layer;
+        var form = layui.form;
 
         // 监听“修改密码”菜单项的点击事件
         document.getElementById('changePassword').addEventListener('click', function () {
@@ -219,7 +217,10 @@
                         }).then(response => {
                             return response.json().then(res => {
                                 if (response.status === 200) {
-                                    layer.msg(res.message, { icon: 1 });
+                                    layer.msg(res.message, { icon: 1, time: 1000 }, function () {
+                                        // 登出
+                                        window.location.href = '/logout';
+                                    });
                                     layer.close(index);
                                 } else {
                                     layer.alert(res.message, { icon: 2 });
