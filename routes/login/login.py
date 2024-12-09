@@ -33,3 +33,11 @@ async def init(
         # 如果已经登入，就重定向到首页
         return RedirectResponse("/index", status_code=302)
     return templates.TemplateResponse("login/login.html", {"request": request})
+
+
+# 登出
+@router.get("/logout", response_class=HTMLResponse)
+async def logout():
+    response = RedirectResponse("/login", status_code=302)
+    response.delete_cookie("access_token")
+    return response

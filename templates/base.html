@@ -27,8 +27,18 @@
                     <a href="/contact">联系</a>
                 </li>
             </ul>
-            <ul class="layui-nav layui-layout-right">
-
+            <ul class="layui-nav layui-layout-right" style="padding-right: 40px;">
+                <li class="layui-nav-item layui-hide layui-show-sm-inline-block">
+                    <a href="javascript:;" style="font-size: 20px;">
+                        你好，{{ user_dict.real_name }}
+                    </a>
+                    <dl class="layui-nav-child">
+                        <dd><a href="javascript:;">用户名：{{ user_dict.username }}</a></dd>
+                        <dd><a href="javascript:;">角色：{{ user_dict.role_name }}</a></dd>
+                        <dd><a href="javascript:;">修改密码</a></dd>
+                        <dd><a href="/logout">登出</a></dd>
+                    </dl>
+                </li>
             </ul>
         </div>
 
