@@ -15,7 +15,7 @@ from typing import Optional  # 功能：用于声明可选参数
 
 import logging
 
-from utils import account_utils, login_utils, user_utils, reimbursement_utils
+from utils import login_utils, user_utils, reimbursement_utils, password_utils
 
 logger = logging.getLogger(__name__)
 
@@ -56,6 +56,37 @@ async def reset_password(
 
     # 重置密码
     if await user_utils.reset_password(username, password):
+        return JSONResponse(content={"message": "修改密码成功"}, status_code=200)
+
+    return JSONResponse(content={"message": "修改密码失败"}, status_code=400)
+
+
+# 修改自己的密码
+@router.post("/user/api/change_password")
+async def change_password(
+    old_password: str = Form(""),  # 旧密码
+    new_password: str = Form(""),  # 新密码
+    confirm_password: str = Form(""),  # 确认密码
+    access_token: Optional[str] = Cookie(None),  # 访问令牌
+):
+    if not old_password or not new_password or not confirm_password:
+        return JSONResponse(content={"message": "请填写完整信息"}, status_code=400)
+
+    # 判断密码是否一致
+    if new_password != confirm_password:
+        return JSONResponse(content={"message": "两次密码不一致"}, status_code=400)
+
+    # 获取登入用户信息
+    user_dict = await user_utils.user_select_all(access_token)
+    if not user_dict:
+        return JSONResponse(content={"message": "请先登录"}, status_code=400)
+
+    # 判断旧密码是否正确
+    if not await login_utils.verify_login(user_dict.get("username"), old_password):
+        return JSONResponse(content={"message": "旧密码错误"}, status_code=400)
+
+    # 修改密码
+    if await user_utils.reset_password(user_dict.get("username"), new_password):
         return JSONResponse(content={"message": "修改密码成功"}, status_code=200)
 
     return JSONResponse(content={"message": "修改密码失败"}, status_code=400)
