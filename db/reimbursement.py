@@ -250,6 +250,7 @@ class ReimbursementTable:
                         r.*,
                         p.project_name,
                         p.project_source,
+                        p.balance AS project_balance,
                         p.is_deleted AS project_is_deleted,
                         c.category_id,
                         c.category_name,
