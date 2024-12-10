@@ -64,8 +64,7 @@
                 } else {
                     layer.alert('暂无可报销的项目', { icon: 5 });
                 }
-            })
-            .catch(err => {
+            }).catch(err => {
                 console.error(err);
                 layer.alert('无法获取可报销的项目列表，请稍后再试。', { icon: 5 });
             });
@@ -80,25 +79,26 @@
                     'Content-Type': 'application/x-www-form-urlencoded'
                 },
                 body: new URLSearchParams(data.field)
-            })
-                .then(response => {
-                    layer.close(loading);
-                    if (response.status == 200) {
-                        return response.json().then(res => {
-                            layer.msg(res.message, { icon: 1 });
-                        });
-                    } else {
-                        return response.json().then(res => {
-                            layer.alert(res.message, { icon: 2 });
-                        });
-                    }
-                }).catch(err => {
-                    layer.close(loading);
-                    console.error(err);
-                    layer.alert('请求失败，请稍后再试。', {
-                        icon: 5
+            }).then(response => {
+                layer.close(loading);
+                if (response.status == 200) {
+                    return response.json().then(res => {
+                        layer.msg(res.message, { icon: 1 });
+                        // 清空表单
+                        document.querySelector('form').reset();
                     });
+                } else {
+                    return response.json().then(res => {
+                        layer.alert(res.message, { icon: 2 });
+                    });
+                }
+            }).catch(err => {
+                layer.close(loading);
+                console.error(err);
+                layer.alert('请求失败，请稍后再试。', {
+                    icon: 5
                 });
+            });
             return false; // 阻止表单默认提交
         });
     });
