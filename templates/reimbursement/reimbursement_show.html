@@ -12,6 +12,34 @@
     }
 </style>
 
+{% if user_dict.role_name == "报销人员" %}
+<!-- 显示报销人员的金额 -->
+<div style="margin-bottom: 20px;">
+    <h2>
+        您的报销账户金额目前有：<span style="color: green;" id="employeeAmount"></span> 元
+    </h2>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        // 调用后台接口获取报销人员的金额
+        fetch('/user/employee/api/employee_amount')
+            .then(response => response.json())
+            .then(data => {
+                if (data.amount !== undefined) {
+                    var amountElement = document.getElementById('employeeAmount');
+                    amountElement.innerText = data.amount;
+                } else {
+                    console.error('无法获取报销金额：', data.message);
+                }
+            })
+            .catch(error => {
+                console.error('获取报销金额时出错：', error);
+            });
+    });
+</script>
+{% endif %}
+
 <!-- 搜索表单 -->
 <form class="layui-form" lay-filter="searchForm" id="searchForm" style="margin-bottom: 20px;">
     <div class="layui-form-item">
