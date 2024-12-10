@@ -40,6 +40,6 @@ async def reimbursement_apply(
     if await reimbursement_utils.reimbursement_apply(
         project_name, user_dict.get("username"), amount, description
     ):
-        return JSONResponse(content={"message": "报销成功"}, status_code=200)
+        return JSONResponse(content={"message": "申请成功"}, status_code=200)
 
-    return JSONResponse(content={"message": "报销失败"}, status_code=400)
+    return JSONResponse(content={"message": "申请失败"}, status_code=400)
