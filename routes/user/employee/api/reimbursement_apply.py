@@ -43,3 +43,16 @@ async def reimbursement_apply(
         return JSONResponse(content={"message": "申请成功"}, status_code=200)
 
     return JSONResponse(content={"message": "申请失败"}, status_code=400)
+
+
+# 获取报销人员的报销后的金额
+@router.get("/user/employee/api/employee_amount")
+async def employee_amount(
+    access_token: Optional[str] = Cookie(None),
+):
+    user_dict = await user_utils.user_select_all(access_token)
+    if user_dict.get("role_name") != "报销人员":
+        return JSONResponse(content={"message": "无权限"}, status_code=403)
+
+    amount = await reimbursement_utils.get_employee_amount(user_dict.get("username"))
+    return JSONResponse(content={"amount": amount}, status_code=200)

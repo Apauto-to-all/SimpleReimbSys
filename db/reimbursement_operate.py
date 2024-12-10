@@ -133,3 +133,21 @@ class ReimbursementOperate:
                 logger.error(traceback.format_exc())
                 logger.error(e)
             return False
+
+    # 获取报销人员的报销后的金额
+    async def reimbursement_employee_amount(self, username: str):
+        async with self.pool.acquire() as conn:
+            try:
+                # 获取报销人员已通过的报销总金额
+                sql = """
+                    SELECT SUM(ra.amount) AS amount
+                    FROM reimbursement_applications AS ra
+                    INNER JOIN users AS u ON ra.employee_id = u.user_id
+                    WHERE u.username = $1 AND ra.status = '已通过';
+                """
+                amount = await conn.fetchval(sql, username)
+                return amount
+            except Exception as e:
+                logger.error(traceback.format_exc())
+                logger.error(e)
+            return 0

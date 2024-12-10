@@ -160,3 +160,20 @@ async def search_finance_reimbursement_list(
         logger.error(traceback.format_exc())
 
     return 0, []
+
+
+# 获取报销人员的报销后的金额
+async def get_employee_amount(username: str) -> float:
+    """
+    获取报销人员的报销后的金额
+    :param username: 用户名
+    :return: 报销后的金额
+    """
+    try:
+        amount = await operate.reimbursement_employee_amount(username)
+        return amount
+    except Exception as e:
+        logger.error(e)
+        logger.error(traceback.format_exc())
+
+    return 0.0
