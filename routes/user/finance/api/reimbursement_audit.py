@@ -45,7 +45,9 @@ async def audit(
     ):
         return JSONResponse(content={"message": "审核成功"}, status_code=200)
 
-    return JSONResponse(content={"message": "审核失败"}, status_code=400)
+    return JSONResponse(
+        content={"message": "审核失败，检测项目余额是否大于报销金额"}, status_code=400
+    )
 
 
 # 获取待审核报销列表api

@@ -1,5 +1,4 @@
 import os
-import sqlite3
 import sys
 import time
 import traceback
@@ -88,16 +87,49 @@ class ReimbursementOperate:
                         comments = $5
                     WHERE reimbursement_id = $1;
                 """
-                if await conn.execute(
-                    sql,
-                    reimbursement_id,
-                    username,
-                    status,
-                    int(time.time()),
-                    comments,
-                ):
+                # 进行报销审核
+                if status == "已通过":
+                    # 获取报销金额和项目余额
+                    sql_amount = """
+                        SELECT ra.amount, p.balance, p.project_id
+                        FROM reimbursement_applications AS ra
+                        INNER JOIN projects AS p ON ra.project_id = p.project_id
+                        WHERE ra.reimbursement_id = $1;
+                    """
+                    result = await conn.fetchrow(sql_amount, reimbursement_id)
+                    if result:
+                        amount = result["amount"]
+                        balance = result["balance"]
+                        project_id = result["project_id"]
+                        if amount <= balance:
+                            await conn.execute(
+                                sql,
+                                reimbursement_id,
+                                username,
+                                status,
+                                int(time.time()),
+                                comments,
+                            )
+                            # 更新项目余额
+                            sql_update_balance = """
+                                UPDATE projects
+                                SET balance = balance - $1
+                                WHERE project_id = $2;
+                            """
+                            await conn.execute(sql_update_balance, amount, project_id)
+                            return True
+                else:
+                    # 拒绝报销
+                    await conn.execute(
+                        sql,
+                        reimbursement_id,
+                        username,
+                        status,
+                        int(time.time()),
+                        comments,
+                    )
                     return True
             except Exception as e:
                 logger.error(traceback.format_exc())
                 logger.error(e)
-                return False
+            return False
