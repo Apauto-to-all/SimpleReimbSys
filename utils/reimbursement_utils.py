@@ -171,7 +171,7 @@ async def get_employee_amount(username: str) -> float:
     """
     try:
         amount = await operate.reimbursement_employee_amount(username)
-        return amount
+        return amount if amount else 0.0
     except Exception as e:
         logger.error(e)
         logger.error(traceback.format_exc())
