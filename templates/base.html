@@ -81,8 +81,30 @@
                     </li>
                     {% elif user_dict.role_name == "财务人员" %}
                     <li class="layui-nav-item">
-                        <a href="/user/finance/audit"><i class="layui-icon layui-icon-app"></i> 审核报销</a>
+                        <a href="/user/finance/audit">
+                            <i class="layui-icon layui-icon-app"></i>
+                            审核报销
+                            <span id="auditBadge" class="layui-badge" style="display: none;"></span>
+                        </a>
                     </li>
+                    <script>
+                        // 确保在 DOM 加载完成后执行
+                        document.addEventListener('DOMContentLoaded', function () {
+                            // 调用后台接口获取待审核数量
+                            fetch('/user/finance/api/reimbursement_list')
+                                .then(response => response.json())
+                                .then(data => {
+                                    if (data.count && data.count > 0) {
+                                        var badge = document.getElementById('auditBadge');
+                                        badge.innerText = data.count;
+                                        badge.style.display = 'inline-block';
+                                    }
+                                })
+                                .catch(error => {
+                                    console.error('Error fetching audit count:', error);
+                                });
+                        });
+                    </script>
                     <!-- 显示所有报销记录 -->
                     <li class="layui-nav-item">
                         <a href="/reimbursement/show"><i class="layui-icon layui-icon-form"></i> 查看审核报销记录</a>
