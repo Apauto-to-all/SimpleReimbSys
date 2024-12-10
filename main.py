@@ -17,10 +17,19 @@ from utils import init_utils
 # 获取日志记录器
 logger = logging.getLogger(__name__)
 
-app = FastAPI()  # 创建 FastAPI 实例
+app = FastAPI(docs_url=None, redoc_url=None, openapi_url=None)  # 创建 FastAPI 实例
 
 app.mount("/static", StaticFiles(directory="static"), name="static")  # 静态文件目录
 app.mount("/layui", StaticFiles(directory="layui"), name="layui")  # layui 静态文件目录
+
+
+@app.middleware("http")
+async def custom_404_redirect(request: Request, call_next):
+    response = await call_next(request)
+    if response.status_code == 404:
+        return RedirectResponse(url="/index")
+    return response
+
 
 db_operation = DatabaseOperation()  # 创建数据库操作对象
 
