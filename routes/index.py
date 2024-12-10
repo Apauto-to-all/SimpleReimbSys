@@ -31,3 +31,35 @@ async def index(
             "index.html", {"request": request, "user_dict": user_dict}
         )
     return RedirectResponse("/login", status_code=302)
+
+
+# about 页面
+@router.get("/about", response_class=HTMLResponse)
+async def about(
+    request: Request,
+    access_token: Optional[str] = Cookie(None),
+):
+    # 检测是否登录
+    user_dict = await user_utils.user_select_all(access_token)
+    if user_dict:
+        return templates.TemplateResponse(
+            "about.html", {"request": request, "user_dict": user_dict}
+        )
+
+    return RedirectResponse("/login", status_code=302)
+
+
+# contact 页面
+@router.get("/contact", response_class=HTMLResponse)
+async def contact(
+    request: Request,
+    access_token: Optional[str] = Cookie(None),
+):
+    # 检测是否登录
+    user_dict = await user_utils.user_select_all(access_token)
+    if user_dict:
+        return templates.TemplateResponse(
+            "contact.html", {"request": request, "user_dict": user_dict}
+        )
+
+    return RedirectResponse("/login", status_code=302)
